@@ -7,11 +7,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.tsx'),
-      } as any,
-      name: 'EvpFrame',
-      fileName: 'evp-frame'
+      entry: resolve(__dirname, 'src/packlets/host/index.ts'),
+      formats: ['es'],
     },
     rollupOptions: {
       external: ['react', 'react-dom'],
@@ -23,5 +20,4 @@ export default defineConfig({
       }
     }
   }
-
 })
