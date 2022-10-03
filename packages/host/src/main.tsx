@@ -1,8 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { MiniAppDemo } from './MiniAppDemo'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <h1>host</h1>
+    <MiniAppDemo />
   </React.StrictMode>
 )

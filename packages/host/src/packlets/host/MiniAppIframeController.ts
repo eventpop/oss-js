@@ -8,7 +8,7 @@ export interface MethodCallEvent {
   replyWithAction: ReplyWithAction
 }
 
-export interface SendMessageEvent {
+export interface RpcMessageEvent {
   id?: string
   method?: string
   params?: any
@@ -41,10 +41,16 @@ export interface MiniAppIframeControllerOptions {
   onMethodCall?: (event: MethodCallEvent) => void
 
   /**
+   * Listener to run when a message is received from the iframe.
+   * Useful for logging.
+   */
+  onReceiveMessage?: (event: RpcMessageEvent) => void
+
+  /**
    * Listener to run when a message is being sent into the iframe.
    * Useful for logging.
    */
-  onSendMessage?: (event: SendMessageEvent) => void
+  onSendMessage?: (event: RpcMessageEvent) => void
 }
 
 /**
@@ -55,14 +61,16 @@ export class MiniAppIframeController {
   private _disposeCallbacks: (() => void)[] = []
   private _routingEnabled: boolean
   private _onMethodCall?: (event: MethodCallEvent) => void
-  private _onSendMessage?: (event: SendMessageEvent) => void
-  private _notificationOrigin = "*"
+  private _onReceiveMessage?: (event: RpcMessageEvent) => void
+  private _onSendMessage?: (event: RpcMessageEvent) => void
+  private _notificationOrigin = '*'
 
   constructor(
     public readonly iframe: HTMLIFrameElement,
-    opts: MiniAppIframeControllerOptions
+    opts: MiniAppIframeControllerOptions,
   ) {
     this._onMethodCall = opts.onMethodCall
+    this._onReceiveMessage = opts.onReceiveMessage
     this._onSendMessage = opts.onSendMessage
     this._routingEnabled = opts.routingEnabled ?? false
 
@@ -71,7 +79,7 @@ export class MiniAppIframeController {
       ...opts.options,
       rpcToken: this._rpcToken,
       origin: window.location.origin,
-      ...(this._routingEnabled && window.location.hash.startsWith("#!")
+      ...(this._routingEnabled && window.location.hash.startsWith('#!')
         ? { initialHash: decodeFromHash(window.location.hash) }
         : {}),
     }).toString()
@@ -79,16 +87,16 @@ export class MiniAppIframeController {
 
     // Add message listener to handle messages from the iframe.
     const listener = (event: MessageEvent) => this.handleMessage(event)
-    window.addEventListener("message", listener)
+    window.addEventListener('message', listener)
     this._disposeCallbacks.push(() => {
-      window.removeEventListener("message", listener)
+      window.removeEventListener('message', listener)
     })
 
     // Add popstate listener to handle history changes.
     if (this._routingEnabled) {
       const listener = (event: PopStateEvent) => {
         const id = crypto.randomUUID()
-        const method = "popState"
+        const method = 'popState'
         const params = {
           state: event.state,
           url: decodeFromHash(window.location.hash),
@@ -96,9 +104,9 @@ export class MiniAppIframeController {
         }
         this._sendToIframe({ id, method, params }, this._notificationOrigin)
       }
-      window.addEventListener("popstate", listener)
+      window.addEventListener('popstate', listener)
       this._disposeCallbacks.push(() => {
-        window.removeEventListener("popstate", listener)
+        window.removeEventListener('popstate', listener)
       })
     }
   }
@@ -114,13 +122,19 @@ export class MiniAppIframeController {
     const {
       id,
       method,
-      params: { rpcToken: receivedRpcToken, ...params } = { rpcToken: "" },
+      params: { rpcToken: receivedRpcToken, ...params } = { rpcToken: '' },
     } = event.data
     if (receivedRpcToken !== rpcToken) {
       return
     }
     const origin = event.origin
     this._notificationOrigin = origin
+
+    this._onReceiveMessage?.({
+      id,
+      method,
+      params,
+    })
 
     const replyWithAction: ReplyWithAction = (asyncFn: () => Promise<any>) => {
       asyncFn()
@@ -135,22 +149,22 @@ export class MiniAppIframeController {
           this._sendToIframe({ id, error }, origin)
         })
     }
-    if (method === "updateHeight") {
+    if (method === 'updateHeight') {
       iframe.style.height = `${params.height}px`
       return
     }
     if (this._routingEnabled) {
-      if (method === "pushState") {
+      if (method === 'pushState') {
         const { state, title, url } = params
         window.history.pushState(state, title, encodeToHash(url))
         return
       }
-      if (method === "replaceState") {
+      if (method === 'replaceState') {
         const { state, title, url } = params
         window.history.pushState(state, title, encodeToHash(url))
         return
       }
-      if (method === "go") {
+      if (method === 'go') {
         const { delta } = params
         window.history.go(delta)
         return
@@ -165,7 +179,7 @@ export class MiniAppIframeController {
     })
   }
 
-  private _sendToIframe(object: SendMessageEvent, origin: string) {
+  private _sendToIframe(object: RpcMessageEvent, origin: string) {
     this.iframe.contentWindow?.postMessage(object, origin)
     this._onSendMessage?.(object)
   }
@@ -176,9 +190,9 @@ export class MiniAppIframeController {
 }
 
 function encodeToHash(url: string) {
-  return (new URL(url, window.location.href).hash || "#").replace(/#/, "#!")
+  return (new URL(url, window.location.href).hash || '#').replace(/#/, '#!')
 }
 
 function decodeFromHash(hash: string) {
-  return hash.replace(/^#!?/, "#")
+  return hash.replace(/^#!?/, '#')
 }
