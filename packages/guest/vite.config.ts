@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/packlets/host/index.ts'),
+      entry: resolve(__dirname, 'src/packlets/guest/index.tsx'),
       formats: ['es'],
     },
     rollupOptions: {
