@@ -1,5 +1,11 @@
 # @eventpop-oss/frame-guest
 
+## 0.1.3
+
+### Patch Changes
+
+- d101eb5: Generate source maps
+
 ## 0.1.2
 
 ### Patch Changes
