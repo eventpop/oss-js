@@ -34,7 +34,7 @@ export const MiniAppDemo: FC = () => {
 
   return (
     <>
-      <h1>@eventpop/frame demo</h1>
+      <h1>@eventpop-oss/frame demo</h1>
       <LogViewer contents={logs} />
       <iframe ref={iframe} style={{ width: 'calc(100% - 4px)' }} />
     </>

@@ -1,5 +1,5 @@
 {
-  "name": "@eventpop/frame",
+  "name": "@eventpop-oss/frame",
   "private": true,
   "version": "0.0.0",
   "workspaces": [

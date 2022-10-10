@@ -1,5 +1,5 @@
 {
-  "name": "@eventpop/frame-host",
+  "name": "@eventpop-oss/frame-host",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
