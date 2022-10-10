@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "files": ["dist", "lib", "src"],
+  "main": "dist/frame-guest.js",
+  "types": "lib/packlets/guest/index.d.ts",
   "scripts": {
     "dev": "vite --port ${PORT:-5273}",
     "build": "tsc && vite build",
