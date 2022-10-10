@@ -1,5 +1,11 @@
 # @eventpop-oss/frame-guest
 
+## 0.1.2
+
+### Patch Changes
+
+- 8111d9e: Add useMiniAppSearchParams
+
 ## 0.1.1
 
 ### Patch Changes
