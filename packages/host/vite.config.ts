@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/packlets/host/index.ts'),
       formats: ['es'],
@@ -15,9 +16,9 @@ export default defineConfig({
       output: {
         globals: {
           react: 'React',
-          'react-dom': 'ReactDOM'
-        }
-      }
-    }
-  }
+          'react-dom': 'ReactDOM',
+        },
+      },
+    },
+  },
 })

@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/packlets/guest/index.tsx'),
       formats: ['es'],
