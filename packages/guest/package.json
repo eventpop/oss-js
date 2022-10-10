@@ -1,8 +1,12 @@
 {
   "name": "@eventpop-oss/frame-guest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
-  "files": ["dist", "lib", "src"],
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
   "main": "dist/frame-guest.js",
   "types": "lib/packlets/guest/index.d.ts",
   "scripts": {
