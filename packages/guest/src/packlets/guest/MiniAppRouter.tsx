@@ -7,6 +7,7 @@ import {
   createMemoryRouter,
   useLoaderData,
   useNavigate as useMiniAppNavigate,
+  useSearchParams as useMiniAppSearchParams,
 } from 'react-router-dom'
 
 import { getMiniAppGuest } from './MiniAppGuest'
@@ -17,6 +18,7 @@ export {
   MiniAppLink,
   useLoaderData,
   useMiniAppNavigate,
+  useMiniAppSearchParams,
 }
 
 export type MiniAppRouter = ReturnType<typeof createMemoryRouter>
