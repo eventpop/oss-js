@@ -11,13 +11,13 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: ['react', 'react/jsx-runtime', 'react-dom', 'react-router-dom'],
       output: {
         globals: {
           react: 'React',
-          'react-dom': 'ReactDOM'
-        }
-      }
-    }
-  }
+          'react-dom': 'ReactDOM',
+        },
+      },
+    },
+  },
 })

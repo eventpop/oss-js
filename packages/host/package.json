@@ -2,6 +2,7 @@
   "name": "@eventpop-oss/frame-host",
   "version": "0.1.0",
   "type": "module",
+  "files": ["dist", "lib", "src"],
   "scripts": {
     "dev": "vite --port ${PORT:-5274}",
     "build": "tsc && vite build",
