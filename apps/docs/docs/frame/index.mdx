@@ -1,3 +1,66 @@
-# frame
+# frame (mini-app)
 
-Heyo
+The **frame** packages are used to create a mini-app that can be embedded in a web page. They implement a micro-frontend pattern that facilitates [run-time integration via iframes](https://martinfowler.com/articles/micro-frontends.html#Run-timeIntegrationViaIframes).
+
+There are 2 packages:
+
+- `@eventpop-oss/frame-host` - The host package is for the application that will embed the mini-app.
+- `@eventpop-oss/frame-guest` - The guest package is for the mini-app that will be embedded. Mini-apps are built with React.
+
+A communication channel between the host and the guest is establish using the [`postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) API.
+
+They work together to:
+
+- Auto-resize the iframe to fit the content.
+- Provide an RPC mechanism to call functions in the guest from the host and vice versa (loosely based on [JSON-RPC](https://www.jsonrpc.org/specification)).
+- Provide joint history management between the host and the guest.
+
+## Creating a mini-app
+
+Implement a mini-app using React and the `@eventpop-oss/frame-guest` package.
+
+### Routing
+
+It features a routing system based on [React Router 6.4](https://reactrouter.com/en/main).
+
+Some [hacks](https://github.com/eventpop/frame/blob/main/packages/guest/src/packlets/guest/MiniAppRouter.tsx) are added to allow it to synchronize the history with the parent window.
+
+- Use **`createMiniApp`** to define a mini-app’s routes [(see example)](https://github.com/eventpop/frame/blob/main/packages/guest/src/DemoMiniApp.tsx).
+
+  - The `routes` property is [the routes array that you would pass to React Router](https://reactrouter.com/en/main/routers/create-browser-router).
+
+- Render a **`<MiniAppPage />`** to mount it to the DOM. [(see example)](https://github.com/eventpop/frame/blob/main/packages/guest/src/main.tsx)
+
+- Use **`<MiniAppLink />`** to link to other routes in the mini-app.
+
+  - It is based on [React Router’s `<Link />`](https://reactrouter.com/en/main/components/link).
+
+- Use **`useMiniAppNavigate`** to programmatically navigate to other routes in the mini-app.
+
+  - It is based on [React Router’s `useNavigate`](https://reactrouter.com/en/main/hooks/use-navigate).
+
+- Use **`useMiniAppSearchParams`** to access (read and write) the search params of the current route.
+
+  - It is based on [React Router’s `useSearchParams`](https://reactrouter.com/en/main/hooks/use-search-params).
+
+### Advanced customization
+
+[Use **`<MiniAppSettingsProvider />`** to customize the mini-app’s settings.](https://github.com/eventpop/frame/blob/main/packages/guest/src/packlets/guest/MiniAppSettings.tsx)
+
+### Resize pausing
+
+Sometimes the auto-resize feature needs to be temporarily disabled. For example, auto-resizing while a drag and drop interaction is in progress can cause it to be canceled. To resolve this problem:
+
+- Create a ResizePauser using **`new ResizePauser()`**. You can put it in the module scope.
+
+- When a drag and drop interaction starts, call **`resizePauser.pause()`**.
+
+- When the drag and drop interaction ends, call **`resizePauser.unpause()`**.
+
+## Embedding a mini-app
+
+Use the `@eventpop-oss/frame-host` package to embed a mini-app.
+
+- Create an `iframe` and use the [**`MiniAppIframeController`**](https://github.com/eventpop/frame/blob/main/packages/host/src/packlets/host/MiniAppIframeController.ts) class to embed a mini-app into that iframe.
+
+- Call `.dispose()` on the instance when you no longer need it.
