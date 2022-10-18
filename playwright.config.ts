@@ -1,5 +1,7 @@
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
+import { version } from '@playwright/test/package.json'
+const uaSuffix = ` Playwright/${version}`
 
 /**
  * Read environment variables from file.
@@ -50,6 +52,7 @@ const config: PlaywrightTestConfig = {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        userAgent: devices['Desktop Chrome'].userAgent + uaSuffix,
       },
     },
 
@@ -57,6 +60,7 @@ const config: PlaywrightTestConfig = {
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
+        userAgent: devices['Desktop Firefox'].userAgent + uaSuffix,
       },
     },
 
@@ -64,6 +68,7 @@ const config: PlaywrightTestConfig = {
       name: 'webkit',
       use: {
         ...devices['Desktop Safari'],
+        userAgent: devices['Desktop Safari'].userAgent + uaSuffix,
       },
     },
 

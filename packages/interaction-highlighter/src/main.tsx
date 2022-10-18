@@ -1,0 +1,3 @@
+import { enableInteractionHighlighter } from '.'
+
+enableInteractionHighlighter()
