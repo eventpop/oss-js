@@ -1,0 +1,35 @@
+# interaction-highlighter
+
+The `@eventpop/interaction-highlighter` package visualizes clicks and focus events on the page. This is useful when recording a video of E2E tests.
+
+## Example usage
+
+This will automatically enable the highlighter when the app being tested with Playwright:
+
+```ts
+import { enableInteractionHighlighter } from '@eventpop-oss/interaction-highlighter'
+
+if (navigator.userAgent.includes('Playwright/')) {
+  enableInteractionHighlighter()
+}
+```
+
+For the above code to work, we need to adjust the Playwright Test configuration to add a user-agent.
+
+```ts
+import { version } from '@playwright/test/package.json'
+const uaSuffix = ` Playwright/${version}`
+
+const config: PlaywrightTestConfig = {
+  // ...
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        userAgent: devices['Desktop Chrome'].userAgent + uaSuffix,
+      },
+    },
+  ],
+}
+```
