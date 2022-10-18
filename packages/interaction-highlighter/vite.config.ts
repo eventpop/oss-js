@@ -7,7 +7,8 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      formats: ['es'],
+      formats: ['es', 'umd'],
+      name: 'InteractionHighlighter',
     },
   },
 })
