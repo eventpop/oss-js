@@ -1,0 +1,23 @@
+{
+  "name": "@eventpop-oss/interaction-highlighter",
+  "version": "0.1.1",
+  "type": "module",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "main": "dist/interaction-highlighter.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "dev": "vite --port ${PORT:-8275}",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.6.4",
+    "vite": "^3.1.4"
+  },
+  "repository": "https://github.com/eventpop/frame"
+}
