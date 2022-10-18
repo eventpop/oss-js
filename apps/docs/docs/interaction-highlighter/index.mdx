@@ -2,9 +2,13 @@
 
 The `@eventpop/interaction-highlighter` package visualizes clicks and focus events on the page. This is useful when recording a video of E2E tests.
 
-## Example usage
+## Example usage with Playwright
 
-This will automatically enable the highlighter when the app being tested with Playwright:
+You can use this with Playwright in 2 ways.
+
+### Option A - Add in your web app
+
+By putting the following code in your application, it will automatically activate the highlighter when the app being tested with Playwright:
 
 ```ts
 import { enableInteractionHighlighter } from '@eventpop-oss/interaction-highlighter'
@@ -32,4 +36,36 @@ const config: PlaywrightTestConfig = {
     },
   ],
 }
+```
+
+### Option B - Add in Playwright
+
+You can [override the context fixture](https://playwright.dev/docs/test-fixtures#overriding-fixtures) so that the interaction highlighter is automatically installed on every page.
+
+```ts
+import { BrowserContext, test as base } from '@playwright/test'
+import { readFileSync } from 'fs'
+
+async function installInteractionHighlighter(context: BrowserContext) {
+  const highlighter = readFileSync(
+    require.resolve(
+      '@eventpop-oss/interaction-highlighter/dist/interaction-highlighter.umd.cjs',
+    ),
+  )
+  await context.addInitScript({
+    content: `void (() => {
+      const exports = {}
+      const module = { exports };
+      ${highlighter};
+      exports.enableInteractionHighlighter();
+    })()`,
+  })
+}
+
+export const test = base.extend({
+  context: async ({ context }, use) => {
+    await installInteractionHighlighter(context)
+    await use(context)
+  },
+})
 ```
