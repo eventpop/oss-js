@@ -10,7 +10,7 @@
   "main": "dist/interaction-highlighter.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "dev": "vite --port ${PORT:-5275}",
+    "dev": "vite --port ${PORT:-8275}",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
