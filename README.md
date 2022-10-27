@@ -1,3 +1,5 @@
-# Eventpop frontend libs
+# `@eventpop-oss`
 
-Open source frontend libraries used in Eventpop, including a library for embedding iframes and facilitating cross-frame communication using postMessage
+Open source JavaScript libraries from Eventpop.
+
+https://www.npmjs.com/~eventpop-oss
