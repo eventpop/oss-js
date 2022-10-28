@@ -1,26 +1,20 @@
 {
-  "name": "@eventpop-oss/frame-guest",
-  "version": "0.1.3",
+  "name": "@eventpop-oss/frame-host",
+  "version": "0.1.2",
   "type": "module",
   "files": [
     "dist",
     "lib",
     "src"
   ],
-  "main": "dist/frame-guest.js",
-  "types": "lib/packlets/guest/index.d.ts",
+  "main": "dist/frame-host.js",
+  "types": "lib/packlets/host/index.d.ts",
   "scripts": {
-    "dev": "vite --port ${PORT:-5273}",
+    "dev": "vite build --watch",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "react-router-dom": "^6.4.1"
-  },
-  "peerDependencies": {
-    "react": "18",
-    "react-dom": "18"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@eventpop-oss/interaction-highlighter": "workspace:*",
     "react": "^18.2.0",
@@ -29,7 +23,8 @@
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.1.0",
     "typescript": "^4.6.4",
-    "vite": "^3.1.4"
+    "vite": "^3.1.4",
+    "@playwright/test": "^1.26.1"
   },
   "repository": "https://github.com/eventpop/frame"
 }
