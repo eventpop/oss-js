@@ -1,6 +1,10 @@
-import { createMiniApp, MiniAppLink } from './packlets/guest'
+import {
+  createMiniApp,
+  MiniAppLink,
+  MiniAppPage,
+} from '@eventpop-oss/frame-guest'
 
-export const DemoMiniApp = createMiniApp({
+const DemoMiniApp = createMiniApp({
   routes: [
     {
       path: '/',
@@ -22,3 +26,9 @@ export const DemoMiniApp = createMiniApp({
     },
   ],
 })
+
+export const MiniAppGuestDemo = () => {
+  return <MiniAppPage miniApp={DemoMiniApp} />
+}
+
+export default MiniAppGuestDemo

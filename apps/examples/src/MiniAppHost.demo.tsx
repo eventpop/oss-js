@@ -1,14 +1,14 @@
 import { FC, useEffect, useRef, useState } from 'react'
-import { MiniAppIframeController } from './packlets/host'
+import { MiniAppIframeController } from '@eventpop-oss/frame-host'
 
-export const MiniAppDemo: FC = () => {
+const MiniAppHostDemo: FC = () => {
   const [logs, setLogs] = useState<string>('Logs will display here...')
   const iframe = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
     const idToMethodMap = new Map<string, string>()
     const controller = new MiniAppIframeController(iframe.current!, {
-      url: 'http://localhost:5273',
+      url: '/?demo=MiniAppGuest',
       options: {},
       routingEnabled: true,
       onReceiveMessage: (event) => {
@@ -82,3 +82,5 @@ const LogViewer: FC<LogViewer> = (props) => {
     </div>
   )
 }
+
+export default MiniAppHostDemo

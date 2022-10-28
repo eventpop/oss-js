@@ -41,9 +41,37 @@ importers:
       '@tsconfig/docusaurus': 1.0.6
       typescript: 4.8.4
 
-  packages/guest:
+  apps/examples:
     specifiers:
+      '@eventpop-oss/frame-guest': workspace:*
+      '@eventpop-oss/frame-host': workspace:*
       '@eventpop-oss/interaction-highlighter': workspace:*
+      '@popperjs/core': ^2.11.6
+      '@types/react': ^18.0.17
+      '@types/react-dom': ^18.0.6
+      '@vitejs/plugin-react': ^2.1.0
+      bootstrap: ^5.2.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      typescript: ^4.6.4
+      vite: ^3.1.4
+    dependencies:
+      '@eventpop-oss/frame-guest': link:../../packages/frame-guest
+      '@eventpop-oss/frame-host': link:../../packages/frame-host
+      '@eventpop-oss/interaction-highlighter': link:../../packages/interaction-highlighter
+      '@popperjs/core': 2.11.6
+      bootstrap: 5.2.2_@popperjs+core@2.11.6
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    devDependencies:
+      '@types/react': 18.0.21
+      '@types/react-dom': 18.0.6
+      '@vitejs/plugin-react': 2.1.0_vite@3.1.7
+      typescript: 4.8.4
+      vite: 3.1.7
+
+  packages/frame-guest:
+    specifiers:
       '@types/react': ^18.0.17
       '@types/react-dom': ^18.0.6
       '@vitejs/plugin-react': ^2.1.0
@@ -55,7 +83,6 @@ importers:
     dependencies:
       react-router-dom: 6.4.2_biqbaboplfbrettd7655fr4n2y
     devDependencies:
-      '@eventpop-oss/interaction-highlighter': link:../interaction-highlighter
       '@types/react': 18.0.21
       '@types/react-dom': 18.0.6
       '@vitejs/plugin-react': 2.1.0_vite@3.1.7
@@ -64,9 +91,9 @@ importers:
       typescript: 4.8.4
       vite: 3.1.7
 
-  packages/host:
+  packages/frame-host:
     specifiers:
-      '@eventpop-oss/interaction-highlighter': workspace:*
+      '@playwright/test': ^1.26.1
       '@types/react': ^18.0.17
       '@types/react-dom': ^18.0.6
       '@vitejs/plugin-react': ^2.1.0
@@ -75,7 +102,7 @@ importers:
       typescript: ^4.6.4
       vite: ^3.1.4
     devDependencies:
-      '@eventpop-oss/interaction-highlighter': link:../interaction-highlighter
+      '@playwright/test': 1.27.0
       '@types/react': 18.0.21
       '@types/react-dom': 18.0.6
       '@vitejs/plugin-react': 2.1.0_vite@3.1.7
@@ -2864,6 +2891,10 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: false
 
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
+    dev: false
+
   /@remix-run/router/1.0.2:
     resolution: {integrity: sha512-GRSOFhJzjGN+d4sKHTMSvNeUPoZiDHWmRnXfzaxrqe7dE/Nzlc8BiMSJdLDESZlndM7jIUrZ/F4yWqVYlI0rwQ==}
     engines: {node: '>=14'}
@@ -3801,6 +3832,14 @@ packages:
 
   /boolbase/1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
+    dev: false
+
+  /bootstrap/5.2.2_@popperjs+core@2.11.6:
+    resolution: {integrity: sha512-dEtzMTV71n6Fhmbg4fYJzQsw1N29hJKO1js5ackCgIpDcGid2ETMGC6zwSYw09v05Y+oRdQ9loC54zB1La3hHQ==}
+    peerDependencies:
+      '@popperjs/core': ^2.11.6
+    dependencies:
+      '@popperjs/core': 2.11.6
     dev: false
 
   /boxen/5.1.2:
