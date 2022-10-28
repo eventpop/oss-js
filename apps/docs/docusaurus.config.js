@@ -6,9 +6,9 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Poplibs',
-  tagline: 'Open source TypeScript libraries from Eventpop',
-  url: 'https://your-docusaurus-test-site.com',
+  title: '@eventpop-oss',
+  tagline: 'Open source JavaScript libraries from Eventpop',
+  url: 'https://eventpop-oss.vercel.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -51,9 +51,9 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Poplibs',
+        title: '@eventpop-oss',
         logo: {
-          alt: 'Poplibs',
+          alt: '@eventpop-oss',
           src: 'img/logo.svg',
         },
         items: [

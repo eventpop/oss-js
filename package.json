@@ -9,10 +9,14 @@
   "devDependencies": {
     "@changesets/cli": "^2.25.0",
     "@playwright/test": "^1.26.1",
+    "@types/node": "^18.11.7",
     "prettier": "^2.7.1",
     "turbo": "^1.5.5"
   },
   "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "preview": "cd apps/examples && pnpm run preview",
     "preinstall": "npx only-allow pnpm",
     "release": "turbo build && changeset publish"
   },

@@ -8,11 +8,11 @@ export default defineConfig({
   build: {
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/packlets/guest/index.tsx'),
+      entry: resolve(__dirname, 'src/index.ts'),
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['react', 'react/jsx-runtime', 'react-dom', 'react-router-dom'],
+      external: ['react', 'react-dom'],
       output: {
         globals: {
           react: 'React',
