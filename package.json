@@ -14,6 +14,8 @@
   },
   "scripts": {
     "dev": "turbo dev",
+    "build": "turbo build",
+    "preview": "cd apps/examples && pnpm run preview",
     "preinstall": "npx only-allow pnpm",
     "release": "turbo build && changeset publish"
   },
