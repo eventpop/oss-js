@@ -60,18 +60,20 @@
   }
   function handlePointerMove(e: PointerEvent) {
     if (!dragging || dragging.id !== e.pointerId) return
-    const targetX = dragging.startButtonX + e.clientX - dragging.startMouseX
-    const targetY = dragging.startButtonY + e.clientY - dragging.startMouseY
-    x = Math.min(1, Math.max(0, targetX / (window.innerWidth - 64)))
-    y = Math.min(1, Math.max(0, targetY / (window.innerHeight - 64)))
-    if (
-      !dragging.moved &&
+    if (dragging.moved) {
+      const targetX = dragging.startButtonX + e.clientX - dragging.startMouseX
+      const targetY = dragging.startButtonY + e.clientY - dragging.startMouseY
+      x = Math.min(1, Math.max(0, targetX / (window.innerWidth - 64)))
+      y = Math.min(1, Math.max(0, targetY / (window.innerHeight - 64)))
+    } else if (
       Math.hypot(
         e.clientX - dragging.startMouseX,
         e.clientY - dragging.startMouseY,
-      ) > 3
+      ) > 8
     ) {
       dragging.moved = true
+      dragging.startMouseX = e.clientX
+      dragging.startMouseY = e.clientY
       if (menu) {
         menu = undefined
       }

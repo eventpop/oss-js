@@ -10,7 +10,7 @@
   "main": "dist/frame-host.js",
   "types": "lib/packlets/host/index.d.ts",
   "scripts": {
-    "dev": "vite dev --port=${PORT:-38371}",
+    "dev": "vite dev --host --port=${PORT:-38371}",
     "build": "tsc && vite build",
     "preview": "vite preview --port=${PORT:-38371}"
   },
