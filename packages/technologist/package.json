@@ -7,7 +7,7 @@
     "lib",
     "src"
   ],
-  "main": "dist/devtools-ui.js",
+  "main": "dist/technologist.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "dev": "vite build --watch",

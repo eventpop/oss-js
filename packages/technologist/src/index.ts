@@ -1,15 +1,15 @@
 import type { Command } from './Command'
-import DevtoolsUi from './DevtoolsUi.svelte'
+import TechnologistUi from './TechnologistUi.svelte'
 
-const _DevtoolsUi = DevtoolsUi as any
-customElements.define('devtools-ui', _DevtoolsUi)
+const _TechnologistUi = TechnologistUi as any
+customElements.define('technologist-ui', _TechnologistUi)
 
 export interface Disposable {
   dispose(): void
 }
 
-export class Devtools {
-  private _devtoolsUi?: any
+export class Technologist {
+  private _ui?: any
   private _enabled = false
   private _commands: Command[] = []
 
@@ -25,12 +25,12 @@ export class Devtools {
   }
 
   _update() {
-    if (!this._enabled && !this._devtoolsUi) return
-    if (!this._devtoolsUi) {
-      this._devtoolsUi = new _DevtoolsUi()
-      document.body.appendChild(this._devtoolsUi)
+    if (!this._enabled && !this._ui) return
+    if (!this._ui) {
+      this._ui = new _TechnologistUi()
+      document.body.appendChild(this._ui)
     }
-    this._devtoolsUi.$set({
+    this._ui.$set({
       enabled: this._enabled,
       commands: this._commands,
     })
