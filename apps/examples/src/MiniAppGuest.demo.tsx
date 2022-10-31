@@ -28,6 +28,14 @@ const DemoMiniApp = createMiniApp({
 })
 
 export const MiniAppGuestDemo = () => {
+  if (window.top === window) {
+    return (
+      <>
+        This page is a mini-app, so it cannot run on its own. You are probably
+        looking for the <a href="/?demo=MiniAppHost">MiniAppHost demo</a>.
+      </>
+    )
+  }
   return <MiniAppPage miniApp={DemoMiniApp} />
 }
 
