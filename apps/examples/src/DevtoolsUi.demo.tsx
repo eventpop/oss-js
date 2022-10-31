@@ -2,6 +2,12 @@ import { Devtools } from '@eventpop-oss/devtools-ui'
 import { useEffect, useState } from 'react'
 
 const d = new Devtools()
+let nextId = 1
+d.registerCommand('Add a command', () => {
+  const command = d.registerCommand(`Dynamic command #${nextId++}`, () => {
+    command.dispose()
+  })
+})
 
 export const DevtoolsUiDemo = () => {
   const [enabled, setEnabled] = useState(false)
