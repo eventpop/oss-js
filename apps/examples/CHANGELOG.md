@@ -1,5 +1,13 @@
 # @eventpop-oss/frame-host
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [cc23aa9]
+- Updated dependencies [cc23aa9]
+  - @eventpop-oss/devtools-ui@0.1.0
+
 ## 0.1.2
 
 ### Patch Changes
