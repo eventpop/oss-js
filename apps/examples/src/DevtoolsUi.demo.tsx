@@ -1,4 +1,4 @@
-import { Devtools } from '@eventpop-oss/devtools-ui'
+import { Devtools } from 'technologist'
 import { useEffect, useState } from 'react'
 
 const d = new Devtools()
