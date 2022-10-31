@@ -1,4 +1,4 @@
-import { Command } from './Command'
+import type { Command } from './Command'
 import DevtoolsUi from './DevtoolsUi.svelte'
 
 const _DevtoolsUi = DevtoolsUi as any
