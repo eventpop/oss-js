@@ -17,6 +17,8 @@
   let menuElement: HTMLElement
   let mounted = false
   let menu: { position?: { x: number; y: number } } | undefined
+  let overlays: { id: number; text: string; x: number; y: number }[] = []
+  let nextOverlayId = 1
   export let enabled = false
   export let commands: Command[] = []
 
@@ -102,9 +104,19 @@
       menu.position = { x, y }
     }
   })
-  function runCommand(command: Command) {
+  function runCommand(command: Command, item: HTMLButtonElement) {
+    const overlay = {
+      text: command.title,
+      id: nextOverlayId++,
+      x: item.getBoundingClientRect().left,
+      y: item.getBoundingClientRect().top,
+    }
     menu = undefined
     command.action()
+    overlays = [...overlays, overlay]
+    setTimeout(() => {
+      overlays = overlays.filter((o) => o !== overlay)
+    }, 1000)
   }
 </script>
 
@@ -149,7 +161,7 @@
     {#each commands as command (command.title)}
       <button
         class="menu-item"
-        on:click={() => runCommand(command)}
+        on:click={(e) => runCommand(command, e.currentTarget)}
         on:mouseenter={(e) => e.currentTarget.focus()}
       >
         {command.title}
@@ -157,6 +169,17 @@
     {/each}
   </div>
 {/if}
+
+{#each overlays as overlay (overlay.id)}
+  <div
+    class="overlay-container"
+    style="left: {overlay.x}px; top: {overlay.y}px;"
+  >
+    <button class="menu-item overlay">
+      {overlay.text}
+    </button>
+  </div>
+{/each}
 
 <svelte:window
   on:pointerup={handlePointerUp}
@@ -186,7 +209,7 @@
     top: 0;
     left: 0;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     padding: 2px;
     background: #d3d0c7;
     box-shadow: inset -1px -1px 0 #424142, inset 1px 1px 0 #fff,
@@ -204,8 +227,38 @@
     color: #000;
     text-align: left;
   }
-  .menu-item:focus {
+  .menu-item:focus,
+  .overlay {
     background: #07216c;
     color: #fff;
+  }
+
+  .overlay-container {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999999;
+  }
+  .overlay {
+    animation: devtools-ui-menu-fade-out 200ms;
+    animation-fill-mode: both;
+    display: block;
+  }
+  @keyframes devtools-ui-menu-fade-out {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    10% {
+      opacity: 1;
+      transform: scale(0.95);
+    }
+    20% {
+      opacity: 1;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.1);
+    }
   }
 </style>
