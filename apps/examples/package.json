@@ -18,7 +18,7 @@
     "@eventpop-oss/frame-guest": "workspace:*",
     "@eventpop-oss/frame-host": "workspace:*",
     "@eventpop-oss/interaction-highlighter": "workspace:*",
-    "@eventpop-oss/devtools-ui": "workspace:*",
+    "technologist": "workspace:*",
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.2",
     "react": "^18.2.0",

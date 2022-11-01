@@ -1,4 +1,4 @@
-# @eventpop-oss/devtools-ui
+# technologist
 
 ## 0.1.0
 

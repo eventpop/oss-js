@@ -33,8 +33,8 @@
     }
     return Math.min(1, Math.max(0, v))
   }
-  let x = f('devtools-ui.x', 1)
-  let y = f('devtools-ui.y', 0)
+  let x = f('technologist.x', 1)
+  let y = f('technologist.y', 0.5)
   let disableClickBecauseJustMoved = false
 
   function handlePointerDown(e: PointerEvent) {
@@ -134,7 +134,7 @@
       class="button"
       bind:this={button}
       on:pointerdown={handlePointerDown}
-      data-testid="Developer tools button"
+      data-testid="Technologist button"
       style="
         transform: translate(
           {(x * -100).toFixed(2)}%,
@@ -157,10 +157,12 @@
       left: {menu.position?.x || 0}px;
       top: {menu.position?.y || 0}px;
     "
+    data-testid="Technologist menu"
   >
-    {#each commands as command (command.title)}
+    {#each commands as command}
       <button
         class="menu-item"
+        data-testid="Technologist command: {command.title}"
         on:click={(e) => runCommand(command, e.currentTarget)}
         on:mouseenter={(e) => e.currentTarget.focus()}
       >
