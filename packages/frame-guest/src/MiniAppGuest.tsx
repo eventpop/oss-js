@@ -17,11 +17,14 @@ class MiniAppGuest {
   private rpcToken: string
   private origin: string
   private _hash: string
+  public locale?: string
 
   constructor() {
     const hashParams = new URLSearchParams(
       window.location.hash.replace(/^#/, ''),
     )
+
+    const locale = hashParams.get('locale')
 
     const rpcToken = hashParams.get('rpcToken')
     if (!rpcToken) {
@@ -35,6 +38,7 @@ class MiniAppGuest {
 
     this.rpcToken = rpcToken
     this.origin = origin
+    this.locale = locale || undefined
     this._hash = String(hashParams.get('initialHash') || '#/')
   }
 
@@ -55,6 +59,7 @@ class MiniAppGuest {
         {
           jsonrpc: '2.0',
           method,
+          locale: this.locale,
           params: { rpcToken: this.rpcToken, ...params },
           ...(id ? { id } : {}),
         },

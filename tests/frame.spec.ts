@@ -36,3 +36,9 @@ test('Injecting hash upon loading', async ({ page }) => {
   const miniapp = page.frameLocator('iframe')
   await expect(miniapp.locator('text=This is the foo route')).toBeVisible()
 })
+
+test('Can get locale from miniapp host', async ({ page }) => {
+  await page.goto('/?demo=MiniAppHost')
+  const miniapp = page.frameLocator('iframe')
+  await expect(miniapp.locator('text=locale is en')).toBeVisible()
+})
