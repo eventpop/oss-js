@@ -1,5 +1,12 @@
 # @eventpop-oss/frame-host
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [df6c3fd]
+  - @eventpop-oss/frame-guest@0.2.0
+
 ## 0.1.3
 
 ### Patch Changes
