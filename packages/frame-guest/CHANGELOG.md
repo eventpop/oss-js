@@ -1,5 +1,11 @@
 # @eventpop-oss/frame-guest
 
+## 0.2.0
+
+### Minor Changes
+
+- df6c3fd: Expose locale passed from the host through getMiniAppGuest().locale
+
 ## 0.1.3
 
 ### Patch Changes
