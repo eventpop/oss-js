@@ -2,8 +2,12 @@ import {
   createMiniApp,
   MiniAppLink,
   MiniAppPage,
+  getMiniAppGuest,
 } from '@eventpop-oss/frame-guest'
 
+function LocaleInspector() {
+  return <p>locale is {getMiniAppGuest().locale}</p>
+}
 const DemoMiniApp = createMiniApp({
   routes: [
     {
@@ -11,6 +15,7 @@ const DemoMiniApp = createMiniApp({
       element: (
         <div style={{ overflow: 'hidden' }}>
           <p>This is the home route</p>
+          <LocaleInspector />
           <MiniAppLink to="/foo">Go to Foo</MiniAppLink>
         </div>
       ),

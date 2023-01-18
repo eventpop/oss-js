@@ -9,7 +9,7 @@ const MiniAppHostDemo: FC = () => {
     const idToMethodMap = new Map<string, string>()
     const controller = new MiniAppIframeController(iframe.current!, {
       url: '/?demo=MiniAppGuest',
-      options: {},
+      options: { locale: 'en' },
       routingEnabled: true,
       onReceiveMessage: (event) => {
         const { id, method, params } = event
