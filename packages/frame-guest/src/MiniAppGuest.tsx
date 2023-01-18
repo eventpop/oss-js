@@ -17,7 +17,7 @@ class MiniAppGuest {
   private rpcToken: string
   private origin: string
   private _hash: string
-  private locale?: string
+  public locale?: string
 
   constructor() {
     const hashParams = new URLSearchParams(
