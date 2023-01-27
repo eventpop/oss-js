@@ -10,6 +10,7 @@
   "keywords": [],
   "author": "Thai Pangsakulyanont <thai@opn.ooo>",
   "license": "ISC",
+  "files": ["dist", "src"],
   "devDependencies": {
     "@aws-sdk/client-sns": "^3.259.0",
     "@google-cloud/tasks": "^3.0.5",
