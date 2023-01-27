@@ -1,0 +1,18 @@
+{
+  "name": "callmeback",
+  "version": "1.0.0",
+  "description": "Welcome to call back service. Serverless-friendly background tasks library.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsup src/index.ts --dts"
+  },
+  "keywords": [],
+  "author": "Thai Pangsakulyanont <thai@opn.ooo>",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.27.0",
+    "fastify": "^4.12.0",
+    "tsup": "^6.5.0",
+    "typescript": "^4.9.4"
+  }
+}
