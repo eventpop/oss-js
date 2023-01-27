@@ -4,6 +4,8 @@ Serverless-friendly background processing library. This library lets you enqueue
 
 - [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
 - [Google Cloud Tasks](https://cloud.google.com/tasks)
+- [Zeplo](https://www.zeplo.io/)
+- [QStash by Upstash](https://upstash.com/blog/qstash-announcement)
 - In-process adapter (for local development and testing)
 
 Due to differences in the way each service works, this library makes the following trade-off:
@@ -208,16 +210,37 @@ About [Zeplo](https://zeplo.io/):
 - [Flexible retry policies.](https://www.zeplo.io/docs/retry)
 - Provides an easy-to-use dashboard for viewing tasks.
 - Allows inspecting the response body and headers.
+- Provides a CLI with the [`zeplo dev`](https://www.zeplo.io/docs/cli) simulator that allows local development.
+
+Setting up:
+
+1. Copy the API key
+
+   ![image](https://user-images.githubusercontent.com/193136/215170807-339c49e9-c519-4a1e-8743-33bd314e9a7a.png)
 
 Creating an adapter:
 
 ```ts
 const adapter = new ZeploAdapter({
+  zeploUrl: process.env.ZEPLO_URL,
   url: 'https://.../',
   token: process.env.ZEPLO_TOKEN,
   retry: 3,
 })
 ```
+
+Expected environment variables:
+
+```sh
+ZEPLO_TOKEN=
+
+# If you want to test locally with `zeplo dev`, uncomment the next line:
+ZEPLO_URL=http://localhost:4747
+```
+
+Inspecting requests in the dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215171001-c3f12421-12fd-4966-a018-41d97ed805d0.png)
 
 ## Usage with QStash
 
@@ -228,6 +251,12 @@ About [QStash](https://upstash.com/blog/qstash-announcement):
 - [Retry count can be configured but the back-off rate is fixed.](https://docs.upstash.com/qstash/features/retry)
 - Provides an easy-to-use dashboard for viewing tasks.
 
+Setting up:
+
+1. Copy the API key
+
+   ![image](https://user-images.githubusercontent.com/193136/215170954-104347e2-39bc-4576-b58f-e0ce33d7406e.png)
+
 Creating an adapter:
 
 ```ts
@@ -237,3 +266,13 @@ const adapter = new QStashAdapter({
   retry: 3,
 })
 ```
+
+Expected environment variables:
+
+```sh
+QSTASH_TOKEN=
+```
+
+Inspecting requests in the dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215171051-73a4ae09-70b3-4f62-a13a-8d92dfb4efdd.png)
