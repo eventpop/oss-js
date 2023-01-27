@@ -4,12 +4,15 @@
   "description": "Welcome to call back service. Serverless-friendly background tasks library.",
   "main": "index.js",
   "scripts": {
-    "build": "tsup src/index.ts --dts"
+    "build": "tsup src/index.ts --dts",
+    "test": "env CI=1 playwright test"
   },
   "keywords": [],
   "author": "Thai Pangsakulyanont <thai@opn.ooo>",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-sns": "^3.259.0",
+    "@google-cloud/tasks": "^3.0.5",
     "@playwright/test": "^1.30.0",
     "@tsconfig/node16": "^1.0.3",
     "@types/node": "^18.11.7",

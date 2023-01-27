@@ -99,10 +99,11 @@ const config: PlaywrightTestConfig = {
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   port: 3000,
-  // },
+  webServer: {
+    command: 'node scripts/requestbin.mjs',
+    port: 35124,
+    reuseExistingServer: true,
+  },
 }
 
 export default config
