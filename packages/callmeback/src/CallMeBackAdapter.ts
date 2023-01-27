@@ -1,3 +1,6 @@
+// https://github.com/DefinitelyTyped/DefinitelyTyped/issues/60924#issuecomment-1246619013
+declare var fetch: typeof import('node-fetch').default
+
 export interface CallMeBackAdapter {
   dispatch(input: DispatchInput): void
 }
