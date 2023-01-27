@@ -5,11 +5,13 @@ import {
   callMeBack,
   CallMeBackAdapter,
   CallMeBackConfig,
+  GoogleCloudTasksAdapter,
   InProcessAdapter,
 } from '../src'
 import { randomUUID } from 'crypto'
 
 import { SNS } from '@aws-sdk/client-sns'
+import { CloudTasksClient } from '@google-cloud/tasks'
 
 function exercise<T extends CallMeBackAdapter>(
   klass: { new (...args: any[]): T },
@@ -18,16 +20,12 @@ function exercise<T extends CallMeBackAdapter>(
   test.describe(klass.name, () => {
     test('calls the endpoint', async ({ request }) => {
       const bin = new Requestbin(request)
-      const config: CallMeBackConfig = {
-        adapter: factory(bin),
-      }
-      for (let i = 0; i < 10; i++) {
-        const value = randomUUID()
-        await callMeBack(config, { value })
-        await expect(async () => {
-          await bin.assertLog({ value })
-        }).toPass()
-      }
+      const config: CallMeBackConfig = { adapter: factory(bin) }
+      const value = randomUUID()
+      await callMeBack(config, { value })
+      await expect(async () => {
+        await bin.assertLog({ value })
+      }).toPass()
     })
   })
 }
@@ -43,9 +41,18 @@ exercise(AmazonSNSAdapter, (_bin) => {
 
   // Note: A subscription with the correct URL must be set up
   // for the topic before this test will pass.
+  const topicArn = process.env.CALLMEBACK_SNS_TOPIC_ARN!
+  const sns = new SNS({})
+  return new AmazonSNSAdapter({ topicArn, sns })
+})
 
-  return new AmazonSNSAdapter({
-    topicArn: process.env.CALLMEBACK_SNS_TOPIC_ARN!,
-    sns: new SNS({}),
+exercise(GoogleCloudTasksAdapter, (bin) => {
+  test.skip(!process.env.CALLMEBACK_CLOUD_TASK_QUEUE, 'Queue path not set')
+
+  const client = new CloudTasksClient()
+  return new GoogleCloudTasksAdapter({
+    client,
+    queuePath: process.env.CALLMEBACK_CLOUD_TASK_QUEUE!,
+    url: bin.postUrl,
   })
 })

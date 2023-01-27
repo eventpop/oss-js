@@ -17,6 +17,9 @@ fastify.post('/post', async (request, _reply) => {
   if (typeof body === 'string') {
     body = JSON.parse(body)
   }
+  if (Math.random() < 0.1) {
+    throw new Error('Random error')
+  }
   log.push(body)
   return { ok: true }
 })
