@@ -22,6 +22,8 @@ jobs:
         run: pnpm exec playwright install --with-deps
       - name: Build all packages
         run: pnpm exec turbo build
+      - name: Run unit tests
+        run: pnpm exec turbo test
       - name: Run Playwright tests
         run: pnpm exec playwright test
       - uses: actions/upload-artifact@v2
