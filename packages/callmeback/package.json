@@ -2,7 +2,7 @@
   "name": "callmeback",
   "version": "0.1.0-0",
   "description": "Welcome to call back service. Serverless-friendly background tasks library.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsup src/index.ts --dts",
     "test": "env CI=1 NODE_OPTIONS=--experimental-fetch playwright test"
