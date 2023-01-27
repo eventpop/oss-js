@@ -4,9 +4,9 @@
 
 Serverless-friendly background processing library. This library lets you enqueue HTTP requests to be processed in the background with adapters for:
 
-- [ ] TODO — [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
-- [ ] TODO — [Google Cloud Tasks](https://cloud.google.com/tasks)
-- [ ] TODO — In-process adapter (for local development and testing)
+- [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
+- [Google Cloud Tasks](https://cloud.google.com/tasks)
+- In-process adapter (for local development and testing)
 
 Due to differences in the way each service works, this library makes the following trade-off:
 
