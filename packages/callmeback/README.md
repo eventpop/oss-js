@@ -1,7 +1,5 @@
 # callmeback
 
-🚧 This project is under construction. It is not yet ready for use. 🚧
-
 Serverless-friendly background processing library. This library lets you enqueue HTTP requests to be processed in the background with adapters for:
 
 - [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
@@ -16,6 +14,8 @@ Due to differences in the way each service works, this library makes the followi
 - The URL is fixed. On some services this must be preconfigured (e.g. [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.subscribe.html)), while on other services it can be configured directly on the adapter (e.g. [Google Cloud Tasks](https://cloud.google.com/tasks/docs/creating-http-target-tasks)).
 - Retry logic depends on the service. Amazon SNS has a [default retry policy](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.retry.html) but [it can be configured](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) on a topic or subscription. On Google Cloud Tasks, a [RetryConfig](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#RetryConfig) can be [configured](https://cloud.google.com/tasks/docs/configuring-queues#retry) on a queue.
 - Rate limiting (throttling) depends on the service. Amazon SNS lets you [configure a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) at the topic or subscription level. Google Cloud Tasks lets you [configure](https://cloud.google.com/tasks/docs/configuring-queues#retry) [RateLimits](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#ratelimits) on a queue.
+- It is your service’s responsibility to verify the authenticity of incoming requests. An easy way is to embed some secret key when invoking `callMeBack()` and verify that the secret key is present on the way back. Or use some kind of signature or JWT.
+- Due to retrying, your service may receive duplicate requests. It is your responsibility to make sure that your background job can be properly retried (e.g. by deduplicating requests or making sure actions are idempotent or conflict-free).
 
 ## Configuring queues and running tests
 
@@ -46,6 +46,32 @@ About [Amazon SNS](https://aws.amazon.com/sns/):
 - Once the subscription is created, you must [confirm the subscription](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.confirm.html). Amazon SNS will send a request to the URL you configured. That request body will contain a `SubscribeURL` parameter. You must make a `GET` request to that URL to confirm the subscription. You can make your endpoint do that automatically, or you can take the URL and visit it manually in your browser.
 - I am not sure whether SNS respects the `Retry-After` response header or not. If someone was able to test this, please let us know and update the documentation.
 - Amazon SNS provides [metrics viewable in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html) out-of-the-box. However, [individual message delivery status logging must be configured and viewed in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-topic-attributes.html). It lets you adjust the sampling rate to save costs.
+
+Setting up:
+
+1. Create a topic:
+
+   ![image](https://user-images.githubusercontent.com/193136/215156534-ba1dde5e-c56b-44e3-86a3-9cf9803f4dfd.png)
+
+2. Set it as a standard queue:
+
+   ![image](https://user-images.githubusercontent.com/193136/215156736-eb55b980-3ee8-4ccc-8425-c3f481d5a0bf.png)
+
+3. Take note of the topic ARN. Create a subscription.
+
+   ![image](https://user-images.githubusercontent.com/193136/215157194-749b01a0-42e1-487f-bfed-c8153da0befa.png)
+
+4. Make it an HTTPS subscription and set an endpoint.
+
+   ![image](https://user-images.githubusercontent.com/193136/215157358-b9cbe0b7-c1f3-4357-933b-c845c51688b8.png)
+
+5. Confirm the subscription by checking the `SubscribeURL`.
+
+   ![image](https://user-images.githubusercontent.com/193136/215157870-96513204-7c3d-413a-93fd-79ba466bdb1d.png)
+
+6. Grant permission to access the queue.
+
+   ![image](https://user-images.githubusercontent.com/193136/215158078-fd3e982d-8bd3-4c3d-8572-0a715d28f8a3.png)
 
 Creating an adapter:
 
