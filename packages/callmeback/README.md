@@ -1,5 +1,7 @@
 # callmeback
 
+🚧 This project is under construction. It is not yet ready for use. 🚧
+
 Serverless-friendly background processing library. This library lets you enqueue HTTP requests to be processed in the background with adapters for:
 
 - [ ] TODO — [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
