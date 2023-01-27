@@ -198,3 +198,42 @@ Check the logs in Google Cloud Logging:
 Inspecting the outstanding tasks in Cloud Tasks dashboard:
 
 > ![image](https://user-images.githubusercontent.com/193136/215159550-11ee12de-7fdb-4800-96bc-a764b06bdb0d.png)
+
+## Usage with Zeplo
+
+About [Zeplo](https://zeplo.io/):
+
+- Very easy to configure.
+- The free plan allows up to 500 requests per month.
+- [Flexible retry policies.](https://www.zeplo.io/docs/retry)
+- Provides an easy-to-use dashboard for viewing tasks.
+- Allows inspecting the response body and headers.
+
+Creating an adapter:
+
+```ts
+const adapter = new ZeploAdapter({
+  url: 'https://.../',
+  token: process.env.ZEPLO_TOKEN,
+  retry: 3,
+})
+```
+
+## Usage with QStash
+
+About [QStash](https://upstash.com/blog/qstash-announcement):
+
+- Very easy to configure.
+- The free plan allows up to 500 requests **per day** with maximum 3 retries.
+- [Retry count can be configured but the back-off rate is fixed.](https://docs.upstash.com/qstash/features/retry)
+- Provides an easy-to-use dashboard for viewing tasks.
+
+Creating an adapter:
+
+```ts
+const adapter = new QStashAdapter({
+  url: 'https://.../',
+  token: process.env.QSTASH_TOKEN,
+  retry: 3,
+})
+```

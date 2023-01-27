@@ -7,6 +7,8 @@ import {
   CallMeBackConfig,
   GoogleCloudTasksAdapter,
   InProcessAdapter,
+  QStashAdapter,
+  ZeploAdapter,
 } from '../src'
 import { randomUUID } from 'crypto'
 
@@ -22,10 +24,12 @@ function exercise<T extends CallMeBackAdapter>(
       const bin = new Requestbin(request)
       const config: CallMeBackConfig = { adapter: factory(bin) }
       const value = randomUUID()
-      await callMeBack(config, { value })
-      await expect(async () => {
-        await bin.assertLog({ value })
-      }).toPass()
+      const task = await callMeBack(config, { value })
+      await test.step(`wait for task ${task.id}`, async () => {
+        await expect(async () => {
+          await bin.assertLog({ value })
+        }).toPass()
+      })
     })
   })
 }
@@ -54,5 +58,25 @@ exercise(GoogleCloudTasksAdapter, (bin) => {
     client,
     queuePath: process.env.CALLMEBACK_CLOUD_TASK_QUEUE!,
     url: bin.postUrl,
+  })
+})
+
+exercise(ZeploAdapter, (bin) => {
+  test.skip(!process.env.ZEPLO_TOKEN, 'Queue path not set')
+
+  return new ZeploAdapter({
+    zeploUrl: process.env.ZEPLO_URL,
+    url: bin.postUrl,
+    token: process.env.ZEPLO_TOKEN!,
+    retry: '3',
+  })
+})
+
+exercise(QStashAdapter, (bin) => {
+  test.skip(!process.env.QSTASH_TOKEN, 'QStash token not set')
+
+  return new QStashAdapter({
+    url: bin.postUrl,
+    token: process.env.QSTASH_TOKEN!,
   })
 })
