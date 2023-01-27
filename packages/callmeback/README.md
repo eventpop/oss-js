@@ -4,9 +4,9 @@
 
 Serverless-friendly background processing library. This library lets you enqueue HTTP requests to be processed in the background with adapters for:
 
-- [ ] TODO — [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
-- [ ] TODO — [Google Cloud Tasks](https://cloud.google.com/tasks)
-- [ ] TODO — In-process adapter (for local development and testing)
+- [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
+- [Google Cloud Tasks](https://cloud.google.com/tasks)
+- In-process adapter (for local development and testing)
 
 Due to differences in the way each service works, this library makes the following trade-off:
 
@@ -52,7 +52,7 @@ Creating an adapter:
 ```ts
 import { SNS } from '@aws-sdk/client-sns'
 
-new AmazonSNSAdapter({
+const adapter = new AmazonSNSAdapter({
   topicArn: process.env.CALLMEBACK_SNS_TOPIC_ARN,
   sns: new SNS({}),
 })
@@ -61,8 +61,72 @@ new AmazonSNSAdapter({
 Expected environment variables:
 
 ```sh
+CALLMEBACK_SNS_TOPIC_ARN=
+
+# When providing credentials to the SDK via environment variables.
+# Note that there may be better ways to provide credentials to the SDK
+# depending on your environment and use case.
+# See: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-iam.html
 AWS_REGION=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
-CALLMEBACK_SNS_TOPIC_ARN=
 ```
+
+Common errors:
+
+- **Error: Region is missing**
+  - May be fixed by setting the `AWS_REGION` environment variable.
+- **CredentialsProviderError: Could not load credentials from any providers**
+  - May be fixed by [providing the credentials to the SDK](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html).
+- **AuthorizationErrorException: User: … is not authorized to perform: SNS:Publish on resource: … because no identity-based policy allows the SNS:Publish action**
+  - May be fixed by granting the user permission to publish to the topic.
+- **InvalidParameterException: Invalid parameter: TopicArn or TargetArn Reason: no value for required parameter**
+  - May be fixed by correctly configuring the `topicArn` (i.e. the `CALLMEBACK_SNS_TOPIC_ARN` environment variable).
+- **NotFoundException: Topic does not exist**
+  - May be fixed by creating the topic (and making sure the topic ARN is correctly configured).
+
+## Usage with Google Cloud Tasks
+
+About [Google Cloud Tasks](https://cloud.google.com/tasks/):
+
+- Allows the URL to be configured on a per-task basis.
+- The URL does not need to be confirmed.
+- [Respects the `Retry-After` response header, and retries with a higher backoff rate if 429 (Too Many Requests) or 503 (Service Unavailable) is returned.](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues.tasks#httprequest)
+- Provides a dashboard for viewing metrics and ongoing task statuses.
+- [Logging can be turned on for individual tasks](https://cloud.google.com/tasks/docs/logging), but it is not enabled by default, as it may generate a large number of logs and can increase costs. Once enabled, it can be viewed in the [Cloud Logging](https://cloud.google.com/logging) dashboard. Note that this is an all-or-nothing setting (no sampling).
+
+Creating an adapter:
+
+```ts
+import { CloudTasksClient } from '@google-cloud/tasks'
+
+const adapter = new GoogleCloudTasksAdapter({
+  client: new CloudTasksClient(),
+  queuePath: process.env.CALLMEBACK_CLOUD_TASK_QUEUE,
+  url: 'https://.../',
+})
+```
+
+Expected environment variables:
+
+```sh
+# PROJECT_ID is the ID of the Google Cloud project, found on the Google Cloud Console dashboard.
+# LOCATION_ID is the ID of the location where the queue is located, e.g. "us-central1".
+# QUEUE_ID is the ID of the queue, e.g. "callmeback".
+CALLMEBACK_CLOUD_TASK_QUEUE=projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID
+
+# When providing service account credentials to the SDK via environment variables.
+# Note that there may be better ways to provide credentials to the SDK
+# depending on your environment and use case.
+# See: https://cloud.google.com/docs/authentication/provide-credentials-adc
+GOOGLE_APPLICATION_CREDENTIALS=
+```
+
+Common errors:
+
+- **Error: Could not load the default credentials.**
+  - May be fixed by [providing the credentials to the SDK](https://cloud.google.com/docs/authentication/provide-credentials-adc).
+- **Error: 3 INVALID_ARGUMENT: Invalid resource field value in the request.**
+  - May be fixed by correctly configuring the `queuePath` (i.e. the `CALLMEBACK_CLOUD_TASK_QUEUE` environment variable) and making sure the `url` is valid.
+- **Error: 7 PERMISSION_DENIED: The principal (user or service account) lacks IAM permission "cloudtasks.tasks.create" for the resource "projects/…/locations/…/queues/…" (or the resource may not exist).**
+  - May be fixed by making sure the queue exists, the `queuePath` is correctly configured, permission to create tasks in the queue is granted to the user or service account (by using the “Cloud Tasks Enqueuer” role).

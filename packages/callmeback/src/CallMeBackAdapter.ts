@@ -43,11 +43,6 @@ export interface InProcessAdapterOptions {
 }
 
 /**
- * An adapter that uses {@link https://cloud.google.com/tasks | Google Cloud Tasks} to enqueue a background HTTP request.
- */
-// export class GoogleCloudTasksAdapter implements CallMeBackAdapter {}
-
-/**
  * An adapter that uses {@link https://aws.amazon.com/sns/ | Amazon SNS} to {@link https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html | enqueue a background HTTP request}.
  *
  * @remarks Requests will be sent with {@link https://docs.aws.amazon.com/sns/latest/dg/sns-large-payload-raw-message-delivery.html | raw message delivery}.
@@ -78,4 +73,52 @@ export interface AmazonSNSPublishParams {
 }
 export interface AmazonSNSPublishResult {
   MessageId?: string
+}
+
+/**
+ * An adapter that uses {@link https://cloud.google.com/tasks | Google Cloud Tasks} to enqueue a background HTTP request.
+ */
+export class GoogleCloudTasksAdapter implements CallMeBackAdapter {
+  constructor(private options: GoogleCloudTasksAdapterOptions) {}
+  async dispatch(input: DispatchInput): Promise<DispatchOutput> {
+    const [result] = await this.options.client.createTask({
+      parent: this.options.queuePath,
+      task: {
+        httpRequest: {
+          httpMethod: 'POST',
+          url: this.options.url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: Buffer.from(input.data).toString('base64'),
+        },
+      },
+    })
+    return {
+      id: String(result.name),
+      raw: result,
+    }
+  }
+}
+export interface GoogleCloudTasksAdapterOptions {
+  client: GoogleCloudTasksClient
+  url: string
+  /**
+   * Queue parent, in format of `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`.
+   */
+  queuePath: string
+}
+export interface GoogleCloudTasksClient {
+  createTask(
+    params: GoogleCloudTasksCreateTaskParams,
+  ): PromiseLike<[result: GoogleCloudTasksCreateTaskResult, ...rest: any[]]>
+}
+export interface GoogleCloudTasksCreateTaskParams {
+  parent: string
+  task: {
+    httpRequest: any
+  }
+}
+export interface GoogleCloudTasksCreateTaskResult {
+  name?: string | null
 }

@@ -1,0 +1,5 @@
+---
+'callmeback': patch
+---
+
+Add GoogleCloudTasksAdapter
