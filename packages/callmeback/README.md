@@ -8,7 +8,7 @@ Serverless-friendly background processing library. This library lets you enqueue
 - [QStash by Upstash](https://upstash.com/blog/qstash-announcement)
 - In-process adapter (for local development and testing)
 
-Due to differences in the way each service works, this library makes the following trade-off:
+Due to differences in the way each service works, this library makes the following trade-off in order to make it extremely easy to switch to other providers when needed:
 
 - The request method is always POST.
 - The request body is always JSON-encoded. Some providers doesn’t allow setting request headers, so your endpoint should be configured to always decode JSON body, even if Content-Type is not `application/json`.
@@ -18,27 +18,6 @@ Due to differences in the way each service works, this library makes the followi
 - Rate limiting (throttling) depends on the service. Amazon SNS lets you [configure a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) at the topic or subscription level. Google Cloud Tasks lets you [configure](https://cloud.google.com/tasks/docs/configuring-queues#retry) [RateLimits](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#ratelimits) on a queue.
 - It is your service’s responsibility to verify the authenticity of incoming requests. An easy way is to embed some secret key when invoking `callMeBack()` and verify that the secret key is present on the way back. Or use some kind of signature or JWT.
 - Due to retrying, your service may receive duplicate requests. It is your responsibility to make sure that your background job can be properly retried (e.g. by deduplicating requests or making sure actions are idempotent or conflict-free).
-
-## Configuring queues and running tests
-
-By default, the tests will only run against the in-process adapter.
-
-To run the tests against other adapters, there are some preparation steps.
-
-1. Expose the `requestbin` service so that it’s publicly available.
-
-   - If you are developing in Codespaces, you can go to the **Ports** tab, right click on the server’s **Local Address** &rarr; **Port Visibility** &rarr; **Public**.
-   - You can also use [ngrok](https://ngrok.com/) or [Cloudflare Quick Tunnel](https://blog.cloudflare.com/quick-tunnels-anytime-anywhere/) to expose the service.
-
-   Then set the environment variable `REQUESTBIN_URL` to the URL of the `requestbin` service **without the trailing slash**, for example:
-
-   ```sh
-   export REQUESTBIN_URL=https://dtinth-verbose-computing-machine-rr4g7rgqv2jgj-35124.preview.app.github.dev
-   ```
-
-2. Set up the credentials for the other adapters.
-
-   - Check out the below sections for more details.
 
 ## Usage with Amazon SNS
 
@@ -276,3 +255,28 @@ QSTASH_TOKEN=
 Inspecting requests in the dashboard:
 
 > ![image](https://user-images.githubusercontent.com/193136/215171051-73a4ae09-70b3-4f62-a13a-8d92dfb4efdd.png)
+
+## Running tests
+
+By default, the tests will only run against the in-process adapter.
+
+To run the tests against other adapters, there are some preparation steps.
+
+1. Run the requestbin script: `node scripts/requestbin.mjs`
+
+   This script starts a web server that lets the tests verify the behavior.
+
+2. Expose the `requestbin` service so that it’s publicly available.
+
+   - If you are developing in Codespaces, you can go to the **Ports** tab, right click on the server’s **Local Address** &rarr; **Port Visibility** &rarr; **Public**.
+   - You can also use [ngrok](https://ngrok.com/) or [Cloudflare Quick Tunnel](https://blog.cloudflare.com/quick-tunnels-anytime-anywhere/) to expose the service.
+
+   Then set the environment variable `REQUESTBIN_URL` to the URL of the `requestbin` service **without the trailing slash**, for example:
+
+   ```sh
+   export REQUESTBIN_URL=https://dtinth-verbose-computing-machine-rr4g7rgqv2jgj-35124.preview.app.github.dev
+   ```
+
+3. Set up the credentials for the other adapters.
+
+   - Check out the above sections for more details.
