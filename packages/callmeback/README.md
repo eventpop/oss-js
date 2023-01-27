@@ -111,6 +111,14 @@ Common errors:
 - **NotFoundException: Topic does not exist**
   - May be fixed by creating the topic (and making sure the topic ARN is correctly configured).
 
+Monitor metrics in CloudWatch:
+
+> ![image](https://user-images.githubusercontent.com/193136/215158684-4472e669-7943-46e4-863b-824f13465578.png)
+
+Setting up logging:
+
+> ![image](https://user-images.githubusercontent.com/193136/215158843-7e36a81f-3d04-41bb-b861-ae7851e11b37.png)
+
 ## Usage with Google Cloud Tasks
 
 About [Google Cloud Tasks](https://cloud.google.com/tasks/):
@@ -120,6 +128,28 @@ About [Google Cloud Tasks](https://cloud.google.com/tasks/):
 - [Respects the `Retry-After` response header, and retries with a higher backoff rate if 429 (Too Many Requests) or 503 (Service Unavailable) is returned.](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues.tasks#httprequest)
 - Provides a dashboard for viewing metrics and ongoing task statuses.
 - [Logging can be turned on for individual tasks](https://cloud.google.com/tasks/docs/logging), but it is not enabled by default, as it may generate a large number of logs and can increase costs. Once enabled, it can be viewed in the [Cloud Logging](https://cloud.google.com/logging) dashboard. Note that this is an all-or-nothing setting (no sampling).
+
+Setting up:
+
+1. Create a task queue.
+
+   ![image](https://user-images.githubusercontent.com/193136/215158976-80e7e21b-cec1-466f-8261-7a66fd89a94c.png)
+
+2. Give it a name and region.
+
+   ![image](https://user-images.githubusercontent.com/193136/215159131-9835f86c-1710-4544-8412-016d3aaf9ca4.png)
+
+   Take note of the **name**, **region ID**, and **project ID** (found on the dashboard).
+
+3. Construct a queue path using this format:
+
+   ```
+   projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID
+   ```
+
+4. Grant access to the queue:
+
+   ![image](https://user-images.githubusercontent.com/193136/215159326-3ebb49fb-377b-4ee1-be7b-63401e22ec13.png)
 
 Creating an adapter:
 
@@ -156,3 +186,15 @@ Common errors:
   - May be fixed by correctly configuring the `queuePath` (i.e. the `CALLMEBACK_CLOUD_TASK_QUEUE` environment variable) and making sure the `url` is valid.
 - **Error: 7 PERMISSION_DENIED: The principal (user or service account) lacks IAM permission "cloudtasks.tasks.create" for the resource "projects/…/locations/…/queues/…" (or the resource may not exist).**
   - May be fixed by making sure the queue exists, the `queuePath` is correctly configured, permission to create tasks in the queue is granted to the user or service account (by using the “Cloud Tasks Enqueuer” role).
+
+Monitor the metrics in Cloud Tasks dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215159448-7934bfb5-7421-454a-a1c8-ad3de692a4ae.png)
+
+Check the logs in Google Cloud Logging:
+
+> ![image](https://user-images.githubusercontent.com/193136/215159508-7cd77625-cc85-438f-b076-b47419dee050.png)
+
+Inspecting the outstanding tasks in Cloud Tasks dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215159550-11ee12de-7fdb-4800-96bc-a764b06bdb0d.png)
