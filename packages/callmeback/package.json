@@ -10,7 +10,7 @@
   "author": "Thai Pangsakulyanont <thai@opn.ooo>",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.27.0",
+    "@playwright/test": "^1.30.0",
     "@tsconfig/node16": "^1.0.3",
     "@types/node": "^18.11.7",
     "fastify": "^4.12.0",

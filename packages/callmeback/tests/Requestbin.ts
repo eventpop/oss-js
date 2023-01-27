@@ -1,7 +1,7 @@
 import { APIRequestContext, expect } from '@playwright/test'
 
 export class Requestbin {
-  url = 'http://localhost:35124'
+  url = process.env.REQUESTBIN_URL || 'http://localhost:35124'
   postUrl = this.url + '/post'
 
   constructor(private request: APIRequestContext) {}

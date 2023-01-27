@@ -1,7 +1,7 @@
-import { CallMeBackAdapter } from "./CallMeBackAdapter"
+import { CallMeBackAdapter } from './CallMeBackAdapter'
 
-export function callMeBack(config: CallMeBackConfig, input: any) {
-
+export async function callMeBack(config: CallMeBackConfig, data: any) {
+  return config.adapter.dispatch({ data: JSON.stringify(data) })
 }
 
 export interface CallMeBackConfig {
