@@ -8,6 +8,42 @@ Serverless-friendly background processing library. This library lets you enqueue
 - [QStash by Upstash](https://upstash.com/blog/qstash-announcement)
 - In-process adapter (for local development and testing)
 
+## Synopsis
+
+```ts
+// Import the function and adapters
+import {
+  callMeBack,
+  CallMeBackConfig,
+  GoogleCloudTasksAdapter,
+} from 'callmeback'
+
+// Import the SDK to use with the adapter
+import { CloudTasksClient } from '@google-cloud/tasks'
+
+// Define the config
+const config: CallMeBackConfig = {
+  adapter: new GoogleCloudTasksAdapter({
+    client: new CloudTasksClient(),
+    queuePath: 'projects/callmeback/locations/us-central1/queues/callmeback',
+    url: 'https://.../process-background-task',
+  }),
+}
+
+// Enqueue a background task
+const { id } = await callMeBack(config, {
+  // Arbitrary JSON data to be passed to the background task
+  type: 'send-email',
+  orderId: '1',
+})
+console.log(`Task ID: ${id}`)
+
+// Some time later, a POST request will be sent to the URL with
+// the specified JSON data as the request body.
+```
+
+## Design
+
 Due to differences in the way each service works, this library makes the following trade-off in order to make it extremely easy to switch to other providers when needed:
 
 - The request method is always POST.
