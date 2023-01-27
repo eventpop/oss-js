@@ -1,5 +1,0 @@
----
-'callmeback': patch
----
-
-Add AmazonSNSAdapter
