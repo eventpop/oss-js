@@ -1,12 +1,16 @@
 // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/60924#issuecomment-1246619013
 declare var fetch: typeof import('node-fetch').default
+import { randomUUID } from 'crypto'
 
 export interface CallMeBackAdapter {
-  dispatch(input: DispatchInput): void
+  dispatch(input: DispatchInput): Promise<DispatchOutput>
 }
-
 export interface DispatchInput {
   data: string
+}
+export interface DispatchOutput {
+  id: string
+  raw: unknown
 }
 
 /**
@@ -19,7 +23,7 @@ export interface DispatchInput {
  */
 export class InProcessAdapter implements CallMeBackAdapter {
   constructor(private options: InProcessAdapterOptions) {}
-  dispatch(input: DispatchInput) {
+  async dispatch(input: DispatchInput): Promise<DispatchOutput> {
     fetch(this.options.url, {
       method: 'POST',
       body: input.data,
@@ -27,6 +31,10 @@ export class InProcessAdapter implements CallMeBackAdapter {
         'Content-Type': 'application/json',
       },
     })
+    return {
+      id: randomUUID(),
+      raw: undefined,
+    }
   }
 }
 
@@ -44,4 +52,30 @@ export interface InProcessAdapterOptions {
  *
  * @remarks Requests will be sent with {@link https://docs.aws.amazon.com/sns/latest/dg/sns-large-payload-raw-message-delivery.html | raw message delivery}.
  */
-// export class AmazonSNSAdapter implements CallMeBackAdapter {}
+export class AmazonSNSAdapter implements CallMeBackAdapter {
+  constructor(private options: AmazonSNSAdapterOptions) {}
+  async dispatch(input: DispatchInput): Promise<DispatchOutput> {
+    const result = await this.options.sns.publish({
+      TopicArn: this.options.topicArn,
+      Message: input.data,
+    })
+    return {
+      id: String(result.MessageId),
+      raw: result,
+    }
+  }
+}
+export interface AmazonSNSAdapterOptions {
+  topicArn: string
+  sns: AmazonSNSPublisher
+}
+export interface AmazonSNSPublisher {
+  publish(params: AmazonSNSPublishParams): PromiseLike<AmazonSNSPublishResult>
+}
+export interface AmazonSNSPublishParams {
+  TopicArn: string
+  Message: string
+}
+export interface AmazonSNSPublishResult {
+  MessageId?: string
+}

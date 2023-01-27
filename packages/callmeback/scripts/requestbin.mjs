@@ -13,7 +13,11 @@ const fastify = Fastify({
 const log = []
 
 fastify.post('/post', async (request, _reply) => {
-  log.push(request.body)
+  let body = request.body
+  if (typeof body === 'string') {
+    body = JSON.parse(body)
+  }
+  log.push(body)
   return { ok: true }
 })
 
