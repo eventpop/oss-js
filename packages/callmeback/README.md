@@ -4,9 +4,47 @@ Serverless-friendly background processing library. This library lets you enqueue
 
 - [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
 - [Google Cloud Tasks](https://cloud.google.com/tasks)
+- [Zeplo](https://www.zeplo.io/)
+- [QStash by Upstash](https://upstash.com/blog/qstash-announcement)
 - In-process adapter (for local development and testing)
 
-Due to differences in the way each service works, this library makes the following trade-off:
+## Synopsis
+
+```ts
+// Import the function and adapters
+import {
+  callMeBack,
+  CallMeBackConfig,
+  GoogleCloudTasksAdapter,
+} from 'callmeback'
+
+// Import the SDK to use with the adapter
+import { CloudTasksClient } from '@google-cloud/tasks'
+
+// Define the config
+const config: CallMeBackConfig = {
+  adapter: new GoogleCloudTasksAdapter({
+    client: new CloudTasksClient(),
+    queuePath: 'projects/callmeback/locations/us-central1/queues/callmeback',
+    url: 'https://.../process-background-task',
+  }),
+}
+
+// Enqueue a background task
+const { id } = await callMeBack(config, {
+  // Arbitrary JSON data to be passed to the background task
+  type: 'send-email',
+  orderId: '1',
+})
+console.log(`Task ID: ${id}`)
+
+// Some time later, a POST request will be sent to the URL with
+// the specified JSON data as the request body.
+```
+
+## Design
+
+Due to differences in the way each service works, this library makes the following trade-off in order to make it extremely easy to switch to other providers when needed:
 
 - The request method is always POST.
 - The request body is always JSON-encoded. Some providers doesn’t allow setting request headers, so your endpoint should be configured to always decode JSON body, even if Content-Type is not `application/json`.
@@ -16,27 +54,6 @@ Due to differences in the way each service works, this library makes the followi
 - Rate limiting (throttling) depends on the service. Amazon SNS lets you [configure a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) at the topic or subscription level. Google Cloud Tasks lets you [configure](https://cloud.google.com/tasks/docs/configuring-queues#retry) [RateLimits](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#ratelimits) on a queue.
 - It is your service’s responsibility to verify the authenticity of incoming requests. An easy way is to embed some secret key when invoking `callMeBack()` and verify that the secret key is present on the way back. Or use some kind of signature or JWT.
 - Due to retrying, your service may receive duplicate requests. It is your responsibility to make sure that your background job can be properly retried (e.g. by deduplicating requests or making sure actions are idempotent or conflict-free).
-
-## Configuring queues and running tests
-
-By default, the tests will only run against the in-process adapter.
-
-To run the tests against other adapters, there are some preparation steps.
-
-1. Expose the `requestbin` service so that it’s publicly available.
-
-   - If you are developing in Codespaces, you can go to the **Ports** tab, right click on the server’s **Local Address** &rarr; **Port Visibility** &rarr; **Public**.
-   - You can also use [ngrok](https://ngrok.com/) or [Cloudflare Quick Tunnel](https://blog.cloudflare.com/quick-tunnels-anytime-anywhere/) to expose the service.
-
-   Then set the environment variable `REQUESTBIN_URL` to the URL of the `requestbin` service **without the trailing slash**, for example:
-
-   ```sh
-   export REQUESTBIN_URL=https://dtinth-verbose-computing-machine-rr4g7rgqv2jgj-35124.preview.app.github.dev
-   ```
-
-2. Set up the credentials for the other adapters.
-
-   - Check out the below sections for more details.
 
 ## Usage with Amazon SNS
 
@@ -198,3 +215,104 @@ Check the logs in Google Cloud Logging:
 Inspecting the outstanding tasks in Cloud Tasks dashboard:
 
 > ![image](https://user-images.githubusercontent.com/193136/215159550-11ee12de-7fdb-4800-96bc-a764b06bdb0d.png)
+
+## Usage with Zeplo
+
+About [Zeplo](https://zeplo.io/):
+
+- Very easy to configure.
+- The free plan allows up to 500 requests per month.
+- [Flexible retry policies.](https://www.zeplo.io/docs/retry)
+- Provides an easy-to-use dashboard for viewing tasks.
+- Allows inspecting the response body and headers.
+- Provides a CLI with the [`zeplo dev`](https://www.zeplo.io/docs/cli) simulator that allows local development.
+
+Setting up:
+
+1. Copy the API key
+
+   ![image](https://user-images.githubusercontent.com/193136/215170807-339c49e9-c519-4a1e-8743-33bd314e9a7a.png)
+
+Creating an adapter:
+
+```ts
+const adapter = new ZeploAdapter({
+  zeploUrl: process.env.ZEPLO_URL,
+  url: 'https://.../',
+  token: process.env.ZEPLO_TOKEN,
+  retry: 3,
+})
+```
+
+Expected environment variables:
+
+```sh
+ZEPLO_TOKEN=
+
+# If you want to test locally with `zeplo dev`, uncomment the next line:
+ZEPLO_URL=http://localhost:4747
+```
+
+Inspecting requests in the dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215171001-c3f12421-12fd-4966-a018-41d97ed805d0.png)
+
+## Usage with QStash
+
+About [QStash](https://upstash.com/blog/qstash-announcement):
+
+- Very easy to configure.
+- The free plan allows up to 500 requests **per day** with maximum 3 retries.
+- [Retry count can be configured but the back-off rate is fixed.](https://docs.upstash.com/qstash/features/retry)
+- Provides an easy-to-use dashboard for viewing tasks.
+
+Setting up:
+
+1. Copy the API key
+
+   ![image](https://user-images.githubusercontent.com/193136/215170954-104347e2-39bc-4576-b58f-e0ce33d7406e.png)
+
+Creating an adapter:
+
+```ts
+const adapter = new QStashAdapter({
+  url: 'https://.../',
+  token: process.env.QSTASH_TOKEN,
+  retry: 3,
+})
+```
+
+Expected environment variables:
+
+```sh
+QSTASH_TOKEN=
+```
+
+Inspecting requests in the dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215171051-73a4ae09-70b3-4f62-a13a-8d92dfb4efdd.png)
+
+## Running tests
+
+By default, the tests will only run against the in-process adapter.
+
+To run the tests against other adapters, there are some preparation steps.
+
+1. Run the requestbin script: `node scripts/requestbin.mjs`
+
+   This script starts a web server that lets the tests verify the behavior.
+
+2. Expose the `requestbin` service so that it’s publicly available.
+
+   - If you are developing in Codespaces, you can go to the **Ports** tab, right click on the server’s **Local Address** &rarr; **Port Visibility** &rarr; **Public**.
+   - You can also use [ngrok](https://ngrok.com/) or [Cloudflare Quick Tunnel](https://blog.cloudflare.com/quick-tunnels-anytime-anywhere/) to expose the service.
+
+   Then set the environment variable `REQUESTBIN_URL` to the URL of the `requestbin` service **without the trailing slash**, for example:
+
+   ```sh
+   export REQUESTBIN_URL=https://dtinth-verbose-computing-machine-rr4g7rgqv2jgj-35124.preview.app.github.dev
+   ```
+
+3. Set up the credentials for the other adapters.
+
+   - Check out the above sections for more details.

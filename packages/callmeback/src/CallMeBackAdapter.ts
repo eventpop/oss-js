@@ -122,3 +122,100 @@ export interface GoogleCloudTasksCreateTaskParams {
 export interface GoogleCloudTasksCreateTaskResult {
   name?: string | null
 }
+
+/**
+ * An adapter that uses {@link https://www.zeplo.io/ | Zeplo} to enqueue a background HTTP request.
+ *
+ * This adapter requires the `fetch` API to be available in the global scope.
+ */
+export class ZeploAdapter implements CallMeBackAdapter {
+  constructor(private options: ZeploAdapterOptions) {}
+  async dispatch(input: DispatchInput): Promise<DispatchOutput> {
+    const url = new URL(
+      `/${new URL(this.options.url)}`,
+      this.options.zeploUrl || 'https://zeplo.to/',
+    )
+    url.searchParams.set('_token', this.options.token)
+    if (this.options.retry) {
+      url.searchParams.set('_retry', String(this.options.retry))
+    }
+    const result = await fetch(url.toString(), {
+      method: 'POST',
+      body: input.data,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(handleFetchResponse)
+    return {
+      id: String(result.id),
+      raw: result,
+    }
+  }
+}
+export interface ZeploAdapterOptions {
+  /**
+   * Overrides the Zeplo URL.
+   *
+   * For example, when testing with {@link https://www.zeplo.io/docs/cli | zeplo dev}
+   * you can set this to `http://localhost:4747`.
+   */
+  zeploUrl?: string
+  url: string
+  token: string
+  /**
+   * {@link https://www.zeplo.io/docs/retry | Retry config}
+   */
+  retry?: string | number
+}
+async function handleFetchResponse(
+  res: import('node-fetch').Response,
+): Promise<any> {
+  if (res.ok) {
+    return res.json()
+  } else {
+    throw new Error(
+      `HTTP ${res.status} ${res.statusText} - ${await res.text()}}`,
+    )
+  }
+}
+
+/**
+ * An adapter that uses {@link https://upstash.com/ | QStash} to enqueue a background HTTP request.
+ *
+ * This adapter requires the `fetch` API to be available in the global scope.
+ */
+export class QStashAdapter implements CallMeBackAdapter {
+  constructor(private options: QStashAdapterOptions) {}
+  async dispatch(input: DispatchInput): Promise<DispatchOutput> {
+    const url = new URL(
+      `/v1/publish/${new URL(this.options.url)}`,
+      this.options.qstashUrl || 'https://qstash.upstash.io',
+    )
+    const result = await fetch(url.toString(), {
+      method: 'POST',
+      body: input.data,
+      headers: {
+        Authorization: `Bearer ${this.options.token}`,
+        'Content-Type': 'application/json',
+        ...(this.options.retry
+          ? {
+              'Upstash-Retries': String(this.options.retry),
+            }
+          : {}),
+      },
+    }).then(handleFetchResponse)
+    return {
+      id: String(result.messageId),
+      raw: result,
+    }
+  }
+}
+export interface QStashAdapterOptions {
+  qstashUrl?: string
+  url: string
+  token: string
+  /**
+   * {@link https://docs.upstash.com/qstash/features/retry | Retry config}
+   */
+  retry?: string | number
+}
