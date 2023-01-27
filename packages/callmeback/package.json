@@ -1,6 +1,6 @@
 {
   "name": "callmeback",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Welcome to call back service. Serverless-friendly background tasks library.",
   "main": "dist/index.js",
   "scripts": {

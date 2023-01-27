@@ -1,5 +1,11 @@
 # callmeback
 
+## 0.2.0
+
+### Minor Changes
+
+- 34fdfc2: Added support for Zeplo and QStash
+
 ## 0.1.0
 
 ### Patch Changes
