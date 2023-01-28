@@ -2,10 +2,10 @@
 
 Serverless-friendly background task processing library. This library lets you enqueue tasks (represented as HTTP POST requests) to be processed in the background by utilizing cloud-based task queue services. Adapters are available for:
 
-- [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
 - [Google Cloud Tasks](https://cloud.google.com/tasks)
-- [Zeplo](https://www.zeplo.io/)
+- [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/sns-http-https-endpoint-as-subscriber.html)
 - [QStash by Upstash](https://upstash.com/blog/qstash-announcement)
+- [Zeplo](https://www.zeplo.io/)
 - In-process adapter (for local development and testing)
 
 ## Synopsis
@@ -57,89 +57,6 @@ Due to differences in the way each service works, this library makes the followi
 - **Backpressure.** The provider will call your endpoint as fast as it could (unless throttling is enabled). Your service should be configured to send a 429 (Too Many Requests) when it is overloaded.
 - **It is your service’s responsibility to verify the authenticity of incoming requests.** An easy way is to embed some secret key when invoking `callMeBack()` and verify that the secret key is present on the way back. Or use some kind of signature or JWT.
 - **Due to retrying, your service may receive duplicate requests.** It is your responsibility to make sure that your background job can be properly retried (e.g. by deduplicating requests or making sure actions are idempotent or conflict-free).
-
-## Usage with Amazon SNS
-
-About [Amazon SNS](https://aws.amazon.com/sns/):
-
-- [The free tier provides 100,000 deliveries per month.](https://aws.amazon.com/sns/pricing/) Billing is required and outgoing data transfer is charged separately.
-- You need to [pre-configure the URL](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.subscribe.html) when creating the subscription.
-- Once the subscription is created, you must [confirm the subscription](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.confirm.html). Amazon SNS will send a request to the URL you configured. That request body will contain a `SubscribeURL` parameter. You must make a `GET` request to that URL to confirm the subscription. You can make your endpoint do that automatically, or you can take the URL and visit it manually in your browser.
-- You can configure [a retry policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) and [a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) on the topic or subscription.
-- I am not sure whether SNS respects the `Retry-After` response header or not. If someone was able to test this, please let us know and update the documentation.
-- Amazon SNS provides [metrics viewable in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html) out-of-the-box. However, [individual message delivery status logging must be configured and viewed in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-topic-attributes.html). It lets you adjust the sampling rate to save costs.
-
-Setting up:
-
-1. Create a topic:
-
-   ![image](https://user-images.githubusercontent.com/193136/215156534-ba1dde5e-c56b-44e3-86a3-9cf9803f4dfd.png)
-
-2. Set it as a standard queue:
-
-   ![image](https://user-images.githubusercontent.com/193136/215156736-eb55b980-3ee8-4ccc-8425-c3f481d5a0bf.png)
-
-3. Take note of the topic ARN. Create a subscription.
-
-   ![image](https://user-images.githubusercontent.com/193136/215157194-749b01a0-42e1-487f-bfed-c8153da0befa.png)
-
-4. Make it an HTTPS subscription and set an endpoint.
-
-   ![image](https://user-images.githubusercontent.com/193136/215157358-b9cbe0b7-c1f3-4357-933b-c845c51688b8.png)
-
-5. Confirm the subscription by checking the `SubscribeURL`.
-
-   ![image](https://user-images.githubusercontent.com/193136/215157870-96513204-7c3d-413a-93fd-79ba466bdb1d.png)
-
-6. Grant permission to access the queue.
-
-   ![image](https://user-images.githubusercontent.com/193136/215158078-fd3e982d-8bd3-4c3d-8572-0a715d28f8a3.png)
-
-Creating an adapter:
-
-```ts
-import { SNS } from '@aws-sdk/client-sns'
-
-const adapter = new AmazonSNSAdapter({
-  topicArn: process.env.CALLMEBACK_SNS_TOPIC_ARN,
-  sns: new SNS({}),
-})
-```
-
-Expected environment variables:
-
-```sh
-CALLMEBACK_SNS_TOPIC_ARN=
-
-# When providing credentials to the SDK via environment variables.
-# Note that there may be better ways to provide credentials to the SDK
-# depending on your environment and use case.
-# See: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-iam.html
-AWS_REGION=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-```
-
-Common errors:
-
-- **Error: Region is missing**
-  - May be fixed by setting the `AWS_REGION` environment variable.
-- **CredentialsProviderError: Could not load credentials from any providers**
-  - May be fixed by [providing the credentials to the SDK](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html).
-- **AuthorizationErrorException: User: … is not authorized to perform: SNS:Publish on resource: … because no identity-based policy allows the SNS:Publish action**
-  - May be fixed by granting the user permission to publish to the topic.
-- **InvalidParameterException: Invalid parameter: TopicArn or TargetArn Reason: no value for required parameter**
-  - May be fixed by correctly configuring the `topicArn` (i.e. the `CALLMEBACK_SNS_TOPIC_ARN` environment variable).
-- **NotFoundException: Topic does not exist**
-  - May be fixed by creating the topic (and making sure the topic ARN is correctly configured).
-
-Monitor metrics in CloudWatch:
-
-> ![image](https://user-images.githubusercontent.com/193136/215158684-4472e669-7943-46e4-863b-824f13465578.png)
-
-Setting up logging:
-
-> ![image](https://user-images.githubusercontent.com/193136/215158843-7e36a81f-3d04-41bb-b861-ae7851e11b37.png)
 
 ## Usage with Google Cloud Tasks
 
@@ -224,54 +141,96 @@ Inspecting the outstanding tasks in Cloud Tasks dashboard:
 
 > ![image](https://user-images.githubusercontent.com/193136/215159550-11ee12de-7fdb-4800-96bc-a764b06bdb0d.png)
 
-## Usage with Zeplo
+## Usage with Amazon SNS
 
-About [Zeplo](https://zeplo.io/):
+About [Amazon SNS](https://aws.amazon.com/sns/):
 
-- Very easy to configure.
-- The free plan allows up to 500 requests per month.
-- [Flexible retry policies.](https://www.zeplo.io/docs/retry)
-- Provides an easy-to-use dashboard for viewing tasks.
-- Allows inspecting the response body and headers.
-- Provides a CLI with the [`zeplo dev`](https://www.zeplo.io/docs/cli) simulator that allows local development.
+- [The free tier provides 100,000 deliveries per month.](https://aws.amazon.com/sns/pricing/) Billing is required and outgoing data transfer is charged separately.
+- You need to [pre-configure the URL](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.subscribe.html) when creating the subscription.
+- Once the subscription is created, you must [confirm the subscription](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.confirm.html). Amazon SNS will send a request to the URL you configured. That request body will contain a `SubscribeURL` parameter. You must make a `GET` request to that URL to confirm the subscription. You can make your endpoint do that automatically, or you can take the URL and visit it manually in your browser.
+- You can configure [a retry policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) and [a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) on the topic or subscription.
+- I am not sure whether SNS respects the `Retry-After` response header or not. If someone was able to test this, please let us know and update the documentation.
+- Amazon SNS provides [metrics viewable in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html) out-of-the-box. However, [individual message delivery status logging must be configured and viewed in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-topic-attributes.html). It lets you adjust the sampling rate to save costs.
 
 Setting up:
 
-1. Copy the API key
+1. Create a topic:
 
-   ![image](https://user-images.githubusercontent.com/193136/215170807-339c49e9-c519-4a1e-8743-33bd314e9a7a.png)
+   ![image](https://user-images.githubusercontent.com/193136/215156534-ba1dde5e-c56b-44e3-86a3-9cf9803f4dfd.png)
+
+2. Set it as a standard queue:
+
+   ![image](https://user-images.githubusercontent.com/193136/215156736-eb55b980-3ee8-4ccc-8425-c3f481d5a0bf.png)
+
+3. Take note of the topic ARN. Create a subscription.
+
+   ![image](https://user-images.githubusercontent.com/193136/215157194-749b01a0-42e1-487f-bfed-c8153da0befa.png)
+
+4. Make it an HTTPS subscription and set an endpoint.
+
+   ![image](https://user-images.githubusercontent.com/193136/215157358-b9cbe0b7-c1f3-4357-933b-c845c51688b8.png)
+
+5. Confirm the subscription by checking the `SubscribeURL`.
+
+   ![image](https://user-images.githubusercontent.com/193136/215157870-96513204-7c3d-413a-93fd-79ba466bdb1d.png)
+
+6. Grant permission to access the queue.
+
+   ![image](https://user-images.githubusercontent.com/193136/215158078-fd3e982d-8bd3-4c3d-8572-0a715d28f8a3.png)
 
 Creating an adapter:
 
 ```ts
-const adapter = new ZeploAdapter({
-  zeploUrl: process.env.ZEPLO_URL,
-  url: 'https://.../',
-  token: process.env.ZEPLO_TOKEN,
-  retry: 3,
+import { SNS } from '@aws-sdk/client-sns'
+
+const adapter = new AmazonSNSAdapter({
+  topicArn: process.env.CALLMEBACK_SNS_TOPIC_ARN,
+  sns: new SNS({}),
 })
 ```
 
 Expected environment variables:
 
 ```sh
-ZEPLO_TOKEN=
+CALLMEBACK_SNS_TOPIC_ARN=
 
-# If you want to test locally with `zeplo dev`, uncomment the next line:
-ZEPLO_URL=http://localhost:4747
+# When providing credentials to the SDK via environment variables.
+# Note that there may be better ways to provide credentials to the SDK
+# depending on your environment and use case.
+# See: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-iam.html
+AWS_REGION=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
 ```
 
-Inspecting requests in the dashboard:
+Common errors:
 
-> ![image](https://user-images.githubusercontent.com/193136/215171001-c3f12421-12fd-4966-a018-41d97ed805d0.png)
+- **Error: Region is missing**
+  - May be fixed by setting the `AWS_REGION` environment variable.
+- **CredentialsProviderError: Could not load credentials from any providers**
+  - May be fixed by [providing the credentials to the SDK](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html).
+- **AuthorizationErrorException: User: … is not authorized to perform: SNS:Publish on resource: … because no identity-based policy allows the SNS:Publish action**
+  - May be fixed by granting the user permission to publish to the topic.
+- **InvalidParameterException: Invalid parameter: TopicArn or TargetArn Reason: no value for required parameter**
+  - May be fixed by correctly configuring the `topicArn` (i.e. the `CALLMEBACK_SNS_TOPIC_ARN` environment variable).
+- **NotFoundException: Topic does not exist**
+  - May be fixed by creating the topic (and making sure the topic ARN is correctly configured).
+
+Monitor metrics in CloudWatch:
+
+> ![image](https://user-images.githubusercontent.com/193136/215158684-4472e669-7943-46e4-863b-824f13465578.png)
+
+Setting up logging:
+
+> ![image](https://user-images.githubusercontent.com/193136/215158843-7e36a81f-3d04-41bb-b861-ae7851e11b37.png)
 
 ## Usage with QStash
 
 About [QStash](https://upstash.com/blog/qstash-announcement):
 
 - Very easy to configure.
-- The free plan allows up to 500 requests **per day** with maximum 3 retries.
-- [Retry count can be configured but the back-off rate is fixed.](https://docs.upstash.com/qstash/features/retry)
+- The free plan allows up to 500 requests per day (amounts to 14,000–15,500 requests per month) with maximum 3 retries.
+- [Retry count can be configured, but the back-off rate is fixed.](https://docs.upstash.com/qstash/features/retry)
 - Provides an easy-to-use dashboard for viewing tasks.
 
 Setting up:
@@ -324,3 +283,45 @@ To run the tests against other adapters, there are some preparation steps.
 3. Set up the credentials for the other adapters.
 
    - Check out the above sections for more details.
+
+## Usage with Zeplo
+
+About [Zeplo](https://zeplo.io/):
+
+- Very easy to configure.
+- The free plan allows up to 500 requests per month.
+- [Flexible retry policies.](https://www.zeplo.io/docs/retry)
+- Provides an easy-to-use dashboard for viewing tasks.
+- Allows inspecting the response body and headers.
+- Provides a CLI with the [`zeplo dev`](https://www.zeplo.io/docs/cli) simulator that allows local development.
+
+Setting up:
+
+1. Copy the API key
+
+   ![image](https://user-images.githubusercontent.com/193136/215170807-339c49e9-c519-4a1e-8743-33bd314e9a7a.png)
+
+Creating an adapter:
+
+```ts
+const adapter = new ZeploAdapter({
+  zeploUrl: process.env.ZEPLO_URL,
+  url: 'https://.../',
+  token: process.env.ZEPLO_TOKEN,
+  retry: 3,
+})
+```
+
+Expected environment variables:
+
+```sh
+ZEPLO_TOKEN=
+
+# If you want to test locally with `zeplo dev`, uncomment the next line:
+ZEPLO_URL=http://localhost:4747
+```
+
+Inspecting requests in the dashboard:
+
+> ![image](https://user-images.githubusercontent.com/193136/215171001-c3f12421-12fd-4966-a018-41d97ed805d0.png)
+
