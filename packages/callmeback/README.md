@@ -54,9 +54,10 @@ Due to differences in the way each service works, this library makes the followi
 - **The target URL is fixed.** Many providers lets you set the target URL on a per-task basis, but some requires a target URL to be pre-configured (e.g. [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.subscribe.html)). On providers that allows setting the URL for each task, the URL can be configured directly on the adapter (e.g. [Google Cloud Tasks](https://cloud.google.com/tasks/docs/creating-http-target-tasks)).
 - **Retry logic depends on the service.** Amazon SNS has a [default retry policy](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.retry.html) but [it can be configured](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) on a topic or subscription. On Google Cloud Tasks, a [RetryConfig](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#RetryConfig) can be [configured](https://cloud.google.com/tasks/docs/configuring-queues#retry) on a queue.
 - **Rate limiting (throttling) depends on the service.** Amazon SNS lets you [configure a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) at the topic or subscription level. Google Cloud Tasks lets you [configure](https://cloud.google.com/tasks/docs/configuring-queues#retry) [RateLimits](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#ratelimits) on a queue.
-- **Backpressure.** The provider will call your endpoint as fast as it could (unless throttling is enabled). Your service should be configured to send a 429 (Too Many Requests) when it is overloaded.
+- **Backpressure.** The provider will call your endpoint as fast as it could (unless throttling is enabled). Your service should be configured to send a 504 (Gateway Timeout) response if it is overloaded. 429 (Too Many Requests) is not recommended because some providers will consider all 4xx responses as permanent failures and stop retrying.
 - **It is your service’s responsibility to verify the authenticity of incoming requests.** An easy way is to embed some secret key when invoking `callMeBack()` and verify that the secret key is present on the way back. Or use some kind of signature or JWT.
 - **Due to retrying, your service may receive duplicate requests.** It is your responsibility to make sure that your background job can be properly retried (e.g. by deduplicating requests or making sure actions are idempotent or conflict-free).
+- **Your service should respond in 10 seconds.** Some providers will consider a request as failed if it takes too long to respond. If your service needs more time to process a request. If it will take more than 10 seconds, you should split the work into multiple tasks.
 
 ## Usage with Google Cloud Tasks
 
@@ -70,6 +71,8 @@ About [Google Cloud Tasks](https://cloud.google.com/tasks/):
 - [Respects the `Retry-After` response header, and retries with a higher backoff rate if 429 (Too Many Requests) or 503 (Service Unavailable) is returned.](https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues.tasks#httprequest)
 - Provides a dashboard for viewing metrics and ongoing task statuses.
 - [Logging can be turned on for individual tasks](https://cloud.google.com/tasks/docs/logging), but it is not enabled by default, as it may generate a large number of logs and can increase costs. Once enabled, it can be viewed in the [Cloud Logging](https://cloud.google.com/logging) dashboard. Note that this is an all-or-nothing setting (no sampling).
+- [You can configure the concurrency limit](https://cloud.google.com/tasks/docs/configuring-queues#rate) to avoid overloading your application.
+- [Task timeout is 10 minutes.](https://cloud.google.com/tasks/docs/creating-http-target-tasks#handler) Although Google Cloud Tasks lets you configure the timeout up to 30 minutes, this library does not let you change it (see [the design](#design) section for the reason).
 
 Setting up:
 
@@ -151,6 +154,8 @@ About [Amazon SNS](https://aws.amazon.com/sns/):
 - You can configure [a retry policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) and [a throttle policy](https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html#creating-delivery-policy) on the topic or subscription.
 - I am not sure whether SNS respects the `Retry-After` response header or not. If someone was able to test this, please let us know and update the documentation.
 - Amazon SNS provides [metrics viewable in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html) out-of-the-box. However, [individual message delivery status logging must be configured and viewed in CloudWatch](https://docs.aws.amazon.com/sns/latest/dg/sns-topic-attributes.html). It lets you adjust the sampling rate to save costs.
+- [Request timeout is 15 seconds](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.prepare.html) (not configurable).
+- [Delivery is considered successful if the response status code is in the range of 200–4xx.](https://docs.aws.amazon.com/sns/latest/dg/SendMessageToHttp.prepare.html)
 
 Setting up:
 
@@ -166,7 +171,7 @@ Setting up:
 
    ![image](https://user-images.githubusercontent.com/193136/215157194-749b01a0-42e1-487f-bfed-c8153da0befa.png)
 
-4. Make it an HTTPS subscription and set an endpoint.
+4. Make it an HTTPS subscription and set an endpoint. **Make sure to enable the “Raw message delivery” option.**
 
    ![image](https://user-images.githubusercontent.com/193136/215157358-b9cbe0b7-c1f3-4357-933b-c845c51688b8.png)
 
@@ -324,4 +329,3 @@ ZEPLO_URL=http://localhost:4747
 Inspecting requests in the dashboard:
 
 > ![image](https://user-images.githubusercontent.com/193136/215171001-c3f12421-12fd-4966-a018-41d97ed805d0.png)
-

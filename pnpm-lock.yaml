@@ -83,9 +83,11 @@ importers:
       '@types/node': ^18.11.7
       '@types/node-fetch': ^2.6.2
       fastify: ^4.12.0
+      lazy-strict-env: ^0.2.1
       pino-pretty: ^9.1.1
       tsup: ^6.5.0
       typescript: ^4.9.4
+      zod: ^3.20.2
     devDependencies:
       '@aws-sdk/client-sns': 3.259.0
       '@google-cloud/tasks': 3.0.5
@@ -94,9 +96,11 @@ importers:
       '@types/node': 18.11.7
       '@types/node-fetch': 2.6.2
       fastify: 4.12.0
+      lazy-strict-env: 0.2.1_zod@3.20.2
       pino-pretty: 9.1.1
       tsup: 6.5.0_typescript@4.9.4
       typescript: 4.9.4
+      zod: 3.20.2
 
   packages/frame-guest:
     specifiers:
@@ -8022,6 +8026,14 @@ packages:
       package-json: 6.5.0
     dev: false
 
+  /lazy-strict-env/0.2.1_zod@3.20.2:
+    resolution: {integrity: sha512-9eqmqaA/LdNFV0gE9VVvM7xgr5NFMu9AzoqiJpFW3+hWSX78x1uaXjoVE5V/mW8nENPaN4LIrGLP1SdOA7+e4Q==}
+    peerDependencies:
+      zod: '>=3.0.0'
+    dependencies:
+      zod: 3.20.2
+    dev: true
+
   /leven/3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
     engines: {node: '>=6'}
@@ -12382,6 +12394,10 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  /zod/3.20.2:
+    resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
+    dev: true
 
   /zwitch/1.0.5:
     resolution: {integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==}

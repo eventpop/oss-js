@@ -13,13 +13,41 @@ const fastify = Fastify({
 const log = []
 
 fastify.post('/post', async (request, _reply) => {
+  /** @type {any} */
   let body = request.body
   if (typeof body === 'string') {
     body = JSON.parse(body)
   }
-  if (Math.random() < 0.1) {
+
+  // Simulate random errors for retrying
+  let errorChance = 0.1
+  if (body.errorChance != null) {
+    errorChance = body.errorChance
+  }
+  if (Math.random() < errorChance) {
     throw new Error('Random error')
   }
+
+  // Add timing information
+  let timing = false
+  if (body.timing) {
+    timing = true
+  }
+  if (timing) {
+    body.start = Date.now()
+  }
+
+  // Simulate request delay
+  let delay = 0
+  if (body.delay != null) {
+    delay = body.delay
+  }
+  await new Promise((resolve) => setTimeout(resolve, delay))
+
+  if (timing) {
+    body.finish = Date.now()
+  }
+
   log.push(body)
   return { ok: true }
 })
