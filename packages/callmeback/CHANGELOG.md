@@ -1,5 +1,11 @@
 # callmeback
 
+## 0.2.1
+
+### Patch Changes
+
+- e506c02: Update package metadata fields
+
 ## 0.2.0
 
 ### Minor Changes
