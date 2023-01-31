@@ -9,6 +9,14 @@
   },
   "keywords": [],
   "author": "Thai Pangsakulyanont <thai@opn.ooo>",
+  "homepage": "https://github.com/eventpop/oss-js/tree/main/packages/callmeback",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eventpop/oss-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eventpop/oss-js/issues"
+  },
   "license": "ISC",
   "files": [
     "dist",
