@@ -18,17 +18,17 @@
     "@eventpop-oss/frame-guest": "workspace:*",
     "@eventpop-oss/frame-host": "workspace:*",
     "@eventpop-oss/interaction-highlighter": "workspace:*",
-    "technologist": "workspace:*",
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "technologist": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.1.0",
-    "typescript": "^4.6.4",
+    "typescript": "^4.9.5",
     "vite": "^3.1.4"
   },
   "repository": "https://github.com/eventpop/frame"
