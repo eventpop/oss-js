@@ -6,7 +6,8 @@
       "outputs": ["dist/**", "lib/**"]
     },
     "test": {
-      "outputs": ["test-results/**", "playwright-report/**"]
+      "outputs": ["test-results/**", "playwright-report/**"],
+      "dependsOn": ["build"]
     },
     "dev": {
       "cache": false
