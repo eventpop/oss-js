@@ -1,4 +1,6 @@
 name: Playwright Tests
+env:
+  TURBO_REMOTE_CACHE_SIGNATURE_KEY: dummy
 on:
   push:
     branches: [main, master]
@@ -10,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - uses: pnpm/action-setup@10693b3829bf86eb2572aef5f3571dcf5ca9287d # v2.2.2
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v2
