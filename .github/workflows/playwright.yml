@@ -1,4 +1,6 @@
 name: Playwright Tests
+env:
+  TURBO_REMOTE_CACHE_SIGNATURE_KEY: dummy
 on:
   push:
     branches: [main, master]
